@@ -103,7 +103,7 @@ export default function DonorForm() {
     console.log("Submitting data:", data);
 
     try {
-      const res = await fetch("http://localhost:3000/api/blood", {
+      const res = await fetch("/api/blood", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

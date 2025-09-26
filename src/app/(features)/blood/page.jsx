@@ -37,7 +37,7 @@ export default  function BloodPage() {
     async function fetchDonors() {
       try {
         const queryString = buildQueryString(filterCriteria);
-        const res = await fetch(`http://localhost:3000/api/blood?${queryString}`);
+        const res = await fetch(`/api/blood?${queryString}`);
         const data = await res.json();
         setDonors(data);
         setFiltered(data);
