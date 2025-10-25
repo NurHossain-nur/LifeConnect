@@ -2,6 +2,8 @@ import { MongoClient, ServerApiVersion } from "mongodb";
 
 export const collectionNamesObj = {
   donorsCollection: "blood_donor",
+  usersCollection: "users",
+  sellersCollection: "sellers",
 };
 
 export default function dbConnect(collectionName) {
