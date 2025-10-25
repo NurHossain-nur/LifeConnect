@@ -10,9 +10,12 @@ export default function ApplySellerPage() {
     email: "",
     shopName: "",
     description: "",
+    phoneNumber: "",
+    address: "",
+    profileImage: null, // File object
   });
 
-  // ✅ Auto-fill name/email when session is loaded
+  // Auto-fill name/email from session
   useEffect(() => {
     if (session?.user) {
       setFormData((prev) => ({
@@ -24,18 +27,27 @@ export default function ApplySellerPage() {
   }, [session]);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value, files } = e.target;
+    if (name === "profileImage") {
+      setFormData({ ...formData, profileImage: files[0] });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      // Example: send to API route
+      // Use FormData for file upload
+      const submissionData = new FormData();
+      for (const key in formData) {
+        submissionData.append(key, formData[key]);
+      }
+
       const res = await fetch("/api/marketplace/seller/apply", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: submissionData,
       });
 
       if (!res.ok) throw new Error("Failed to submit application");
@@ -92,6 +104,31 @@ export default function ApplySellerPage() {
           onChange={handleChange}
           className="w-full p-3 border rounded-md h-24"
           required
+        />
+        <input
+          type="tel"
+          name="phoneNumber"
+          placeholder="Phone Number"
+          value={formData.phoneNumber}
+          onChange={handleChange}
+          className="w-full p-3 border rounded-md"
+          required
+        />
+        <input
+          type="text"
+          name="address"
+          placeholder="Shop Address"
+          value={formData.address}
+          onChange={handleChange}
+          className="w-full p-3 border rounded-md"
+          required
+        />
+        <input
+          type="file"
+          name="profileImage"
+          accept="image/*"
+          onChange={handleChange}
+          className="w-full p-3 border rounded-md"
         />
         <button
           type="submit"

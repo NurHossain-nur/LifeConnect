@@ -13,6 +13,7 @@ export default function MarketplaceLayout({ children }) {
   const navItems = useMemo(() => {
     const items = [
       { href: "/marketplace", label: "User View" },
+      { href: "/marketplace/my-orders", label: "My Orders" },
     ];
 
     // Only add seller link if user is seller

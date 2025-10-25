@@ -4,6 +4,8 @@ export const collectionNamesObj = {
   donorsCollection: "blood_donor",
   usersCollection: "users",
   sellersCollection: "sellers",
+  allSellersProductsCollection: "sellers_products",
+  orderCollection: "orders"
 };
 
 export default function dbConnect(collectionName) {

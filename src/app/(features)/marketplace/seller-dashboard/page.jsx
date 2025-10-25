@@ -1,131 +1,109 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Swal from "sweetalert2";
 
 export default function SellerDashboard() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+  const [stats, setStats] = useState({
+    totalProducts: 0,
+    ordersThisMonth: 0,
+    totalRevenue: 0,
+    pendingShipments: 0,
+    recentOrders: [],
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const fetchDashboardData = async () => {
+    try {
+      const res = await fetch("/api/marketplace/seller/dashboard");
+      const data = await res.json();
+
+      if (data.success) setStats(data.data);
+      else Swal.fire("Error!", data.message, "error");
+    } catch (err) {
+      console.error("Error fetching dashboard:", err);
+      Swal.fire("Error!", "Unable to load dashboard data.", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading)
+    return <p className="text-center mt-10 text-gray-600">Loading dashboard...</p>;
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
-      {/* Sidebar */}
-      <aside
-        className={`${
-          isSidebarOpen ? "w-64" : "w-16"
-        } bg-green-800 text-white transition-all duration-300 flex flex-col`}
-      >
-        <div className="flex items-center justify-between p-4 font-bold text-lg border-b border-green-700">
-          <span>{isSidebarOpen ? "Seller Panel" : "S"}</span>
-          <button onClick={toggleSidebar} className="text-sm">
-            {isSidebarOpen ? "⏴" : "⏵"}
-          </button>
-        </div>
+    <div className="p-6 flex-1 overflow-y-auto">
+      <h2 className="text-lg font-medium mb-4">
+        Welcome, {stats.sellerName || "Seller"}!
+      </h2>
+      <p className="text-gray-500 mb-6">
+        Shop: <span className="font-semibold">{stats.shopName || "N/A"}</span>
+      </p>
 
-        <nav className="flex-1 mt-4 space-y-2">
-          {[
-            { label: "Dashboard", icon: "📊" },
-            { label: "My Products", icon: "🛍️" },
-            { label: "Orders", icon: "📦" },
-            { label: "Add Product", icon: "➕" },
-            { label: "Settings", icon: "⚙️" },
-          ].map((item) => (
-            <a
-              key={item.label}
-              href="#"
-              className="flex items-center gap-3 px-4 py-2 hover:bg-green-700"
-            >
-              <span>{item.icon}</span>
-              {isSidebarOpen && <span>{item.label}</span>}
-            </a>
-          ))}
-        </nav>
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <Card label="Total Products" value={stats.totalProducts} />
+        <Card label="Orders This Month" value={stats.ordersThisMonth} />
+        <Card
+          label="Revenue"
+          value={`$${stats.totalRevenue.toLocaleString()}`}
+        />
+        <Card label="Pending Shipments" value={stats.pendingShipments} />
+      </div>
 
-        <div className="p-4 border-t border-green-700 text-sm">
-          {isSidebarOpen ? "© 2025 Seller Inc." : "©"}
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col">
-        {/* Navbar */}
-        <header className="bg-white shadow p-4 flex justify-between items-center">
-          <h1 className="text-xl font-semibold">Seller Dashboard</h1>
-          <div className="flex items-center gap-4">
-            <span className="text-gray-600">Welcome, Seller 👋</span>
-            <button className="bg-green-600 text-white px-3 py-1 rounded">
-              Logout
-            </button>
-          </div>
-        </header>
-
-        {/* Content */}
-        <section className="p-6 flex-1 overflow-y-auto">
-          <h2 className="text-lg font-medium mb-4">Sales Overview</h2>
-
-          {/* Summary Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div className="bg-white shadow rounded p-4">
-              <p className="text-gray-500">Total Products</p>
-              <p className="text-2xl font-semibold">48</p>
-            </div>
-            <div className="bg-white shadow rounded p-4">
-              <p className="text-gray-500">Orders This Month</p>
-              <p className="text-2xl font-semibold">124</p>
-            </div>
-            <div className="bg-white shadow rounded p-4">
-              <p className="text-gray-500">Revenue</p>
-              <p className="text-2xl font-semibold">$3,480</p>
-            </div>
-            <div className="bg-white shadow rounded p-4">
-              <p className="text-gray-500">Pending Shipments</p>
-              <p className="text-2xl font-semibold">9</p>
-            </div>
-          </div>
-
-          {/* Recent Orders Table */}
-          <div className="bg-white shadow rounded p-4 overflow-x-auto">
-            <h3 className="text-md font-medium mb-4">Recent Orders</h3>
-            <table className="w-full text-left text-sm">
-              <thead>
-                <tr className="border-b bg-gray-50">
-                  <th className="p-2">Order ID</th>
-                  <th className="p-2">Product</th>
-                  <th className="p-2">Customer</th>
-                  <th className="p-2">Status</th>
-                  <th className="p-2">Amount</th>
+      {/* Recent Orders */}
+      <div className="bg-white shadow rounded p-4 overflow-x-auto">
+        <h3 className="text-md font-medium mb-4">Recent Orders</h3>
+        {stats.recentOrders.length === 0 ? (
+          <p className="text-gray-500 text-center py-6">No recent orders.</p>
+        ) : (
+          <table className="w-full text-left text-sm">
+            <thead>
+              <tr className="border-b bg-gray-50">
+                <th className="p-2">Order ID</th>
+                <th className="p-2">Customer</th>
+                <th className="p-2">Status</th>
+                <th className="p-2">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              {stats.recentOrders.map((order) => (
+                <tr key={order.id} className="border-b hover:bg-gray-50">
+                  <td className="p-2 text-gray-600">{order.id}</td>
+                  <td className="p-2">{order.customer}</td>
+                  <td className="p-2">
+                    <span
+                      className={`px-2 py-1 rounded text-xs capitalize ${
+                        order.status?.toLowerCase() === "delivered"
+                          ? "bg-green-100 text-green-700"
+                          : order.status?.toLowerCase() === "pending"
+                          ? "bg-yellow-100 text-yellow-700"
+                          : "bg-blue-100 text-blue-700"
+                      }`}
+                    >
+                      {order.status}
+                    </span>
+                  </td>
+                  <td className="p-2 font-medium">{order.amount}</td>
                 </tr>
-              </thead>
-              <tbody>
-                {[
-                  { id: "#00123", product: "Wireless Headphones", customer: "Jane Doe", status: "Shipped", amount: "$120" },
-                  { id: "#00124", product: "Gaming Mouse", customer: "John Smith", status: "Pending", amount: "$45" },
-                  { id: "#00125", product: "Keyboard", customer: "Alice Lee", status: "Delivered", amount: "$60" },
-                ].map((order) => (
-                  <tr key={order.id} className="border-b hover:bg-gray-50">
-                    <td className="p-2">{order.id}</td>
-                    <td className="p-2">{order.product}</td>
-                    <td className="p-2">{order.customer}</td>
-                    <td className="p-2">
-                      <span
-                        className={`px-2 py-1 rounded text-xs ${
-                          order.status === "Delivered"
-                            ? "bg-green-100 text-green-700"
-                            : order.status === "Pending"
-                            ? "bg-yellow-100 text-yellow-700"
-                            : "bg-blue-100 text-blue-700"
-                        }`}
-                      >
-                        {order.status}
-                      </span>
-                    </td>
-                    <td className="p-2 font-medium">{order.amount}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      </main>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function Card({ label, value }) {
+  return (
+    <div className="bg-white shadow rounded p-4 text-center">
+      <p className="text-gray-500">{label}</p>
+      <p className="text-2xl font-semibold">{value}</p>
     </div>
   );
 }
