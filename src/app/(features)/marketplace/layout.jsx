@@ -51,7 +51,7 @@ export default function MarketplaceLayout({ children }) {
       </nav>
 
       {/* Page Content */}
-      <main>{children}</main>
+      <main className="min-w-screen bg-white">{children}</main>
     </div>
   );
 }

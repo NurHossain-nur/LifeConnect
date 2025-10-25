@@ -12,6 +12,8 @@ export default function Navbar() {
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
+  const isAdmin = session?.user?.role === "admin";
+
   return (
     <header className="bg-white shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
@@ -26,10 +28,12 @@ export default function Navbar() {
           <Link href="/blood" className="hover:text-red-600">Blood Donation</Link>
           <Link href="/marketplace" className="hover:text-red-600">Books & Notes</Link>
           <Link href="/electric" className="hover:text-red-600">Electric Items</Link>
-          <Link href="/dashboard/admin" className="hover:text-red-600">Dashboard</Link>
+          {isAdmin && (
+            <Link href="/dashboard/admin" className="hover:text-red-600">Dashboard</Link>
+          )}
           <Link href="/register" className="hover:text-red-600">Register</Link>
 
-          {/* ✅ Conditional Auth Buttons */}
+          {/* Auth Buttons */}
           {status === "loading" ? null : session ? (
             <div className="flex items-center gap-3">
               <Link href="/profile" title="Profile">
@@ -62,8 +66,13 @@ export default function Navbar() {
             <Link href="/blood" className="hover:text-red-600" onClick={toggleMenu}>Blood Donation</Link>
             <Link href="/marketplace" className="hover:text-red-600" onClick={toggleMenu}>Books & Notes</Link>
             <Link href="/electric" className="hover:text-red-600" onClick={toggleMenu}>Electric Items</Link>
+            {isAdmin && (
+              <Link href="/dashboard/admin" className="hover:text-red-600" onClick={toggleMenu}>
+                Dashboard
+              </Link>
+            )}
 
-            {/* ✅ Mobile Auth Logic */}
+            {/* Mobile Auth */}
             {status === "loading" ? null : session ? (
               <>
                 <Link

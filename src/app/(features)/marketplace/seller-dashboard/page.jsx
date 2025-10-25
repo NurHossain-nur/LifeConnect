@@ -36,7 +36,7 @@ export default function SellerDashboard() {
     return <p className="text-center mt-10 text-gray-600">Loading dashboard...</p>;
 
   return (
-    <div className="p-6 flex-1 overflow-y-auto">
+    <div className="p-6 text-black flex-1 overflow-y-auto">
       <h2 className="text-lg font-medium mb-4">
         Welcome, {stats.sellerName || "Seller"}!
       </h2>

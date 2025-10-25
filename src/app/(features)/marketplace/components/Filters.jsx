@@ -7,7 +7,7 @@ export default function Filters({
   categories, brands, tags
 }) {
   return (
-    <div className="flex flex-wrap justify-center gap-4 mb-6">
+    <div className="flex text-black flex-wrap justify-center gap-4 mb-6">
       <input
         type="text"
         value={search}

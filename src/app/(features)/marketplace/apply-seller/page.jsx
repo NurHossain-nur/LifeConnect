@@ -64,7 +64,7 @@ export default function ApplySellerPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto bg-white mt-10 p-6 rounded-lg shadow">
+    <div className="max-w-2xl text-black mx-auto bg-white mt-10 p-6 rounded-lg shadow">
       <h1 className="text-2xl font-bold text-red-600 mb-4 text-center">
         Become a Seller
       </h1>

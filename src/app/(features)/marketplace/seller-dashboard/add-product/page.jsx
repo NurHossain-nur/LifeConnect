@@ -79,7 +79,7 @@ export default function AddProductPage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto bg-white shadow p-6 rounded-md">
+    <div className="max-w-3xl text-black mx-auto bg-white shadow p-6 rounded-md">
       <h2 className="text-2xl font-semibold mb-6">➕ Add New Product</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">

@@ -53,7 +53,7 @@ export default function SellerRequestsPage() {
   if (loading) return <p className="text-center mt-10 text-gray-500">Loading...</p>;
 
   return (
-    <div className="max-w-5xl mx-auto mt-10 bg-white p-6 rounded-lg shadow">
+    <div className="max-w-5xl text-black mx-auto mt-10 bg-white p-6 rounded-lg shadow">
       <h1 className="text-2xl font-bold text-red-600 mb-6 text-center">
         Seller Applications
       </h1>
@@ -89,24 +89,30 @@ export default function SellerRequestsPage() {
                   {app.status}
                 </td>
                 <td className="border p-2 text-center">
-                  {app.status === "pending" ? (
-                    <div className="flex justify-center gap-2">
-                      <button
-                        onClick={() => handleAction(app.userId, "approve")}
-                        className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
-                      >
-                        Approve
-                      </button>
-                      <button
-                        onClick={() => handleAction(app.userId, "reject")}
-                        className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                      >
-                        Reject
-                      </button>
-                    </div>
-                  ) : (
-                    <span className="italic text-gray-400">No actions</span>
-                  )}
+                  <div className="flex justify-center gap-2">
+                    {app.status === "pending" && (
+                      <>
+                        <button
+                          onClick={() => handleAction(app.userId, "approve")}
+                          className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                        >
+                          Approve
+                        </button>
+                        <button
+                          onClick={() => handleAction(app.userId, "reject")}
+                          className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                        >
+                          Reject
+                        </button>
+                      </>
+                    )}
+                    <button
+                      onClick={() => window.location.href = `/dashboard/admin/seller/${app.userId}`}
+                      className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                    >
+                      Details
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}

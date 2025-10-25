@@ -42,7 +42,7 @@ export default function SellerDashboard({ children }) {
   }, []);
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex max-w-7xl mx-auto min-h-screen bg-gray-100">
       {/* Sidebar */}
       <aside
         className={`${

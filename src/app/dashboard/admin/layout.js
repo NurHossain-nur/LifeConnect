@@ -23,7 +23,8 @@ export default function AdminPage({ children }) {
   const activeItem = navItems.find((item) => pathname.startsWith(item.href))?.label || "Dashboard";
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="  bg-gray-100">
+      <div className="flex max-w-7xl mx-auto min-h-screen bg-gray-100">
       {/* Sidebar */}
       <aside
         className={`${
@@ -73,6 +74,7 @@ export default function AdminPage({ children }) {
         {/* Content */}
         <section className="p-6 flex-1 overflow-y-auto">{children}</section>
       </main>
+      </div>
     </div>
   );
 }
