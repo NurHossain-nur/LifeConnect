@@ -6,7 +6,7 @@ export const POST = async (req) => {
     const body = await req.json();
     const { name, email, phone, password } = body;
 
-    if (!name || !email ||!phone || !password ) {
+    if (!name || !email || !phone || !password) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
@@ -24,13 +24,28 @@ export const POST = async (req) => {
       );
     }
 
+    // Normalize phone with +
+    const normalizedPhone = phone.startsWith("+") ? phone : `+${phone}`;
+
     // TODO: Hash password before saving, e.g. using bcrypt
 
-    const result = await usersCollection.insertOne({ name, email, phone, password, role: "user" });
+    const result = await usersCollection.insertOne({
+      name,
+      email,
+      phone: normalizedPhone,
+      password,
+      role: "user",
+    });
 
-    return NextResponse.json({ message: "User registered", id: result.insertedId });
+    return NextResponse.json({
+      message: "User registered",
+      id: result.insertedId,
+    });
   } catch (error) {
     console.error("Error registering user:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 };

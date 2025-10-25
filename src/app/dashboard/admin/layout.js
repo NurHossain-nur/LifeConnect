@@ -13,10 +13,10 @@ export default function AdminPage({ children }) {
   // Map routes to labels and icons
   const navItems = [
     { label: "Dashboard", icon: "📊", href: "/dashboard/admin" },
-    { label: "Users", icon: "👤", href: "/admin/users" },
+    // { label: "Users", icon: "👤", href: "/dashboard/admin/users" },
     { label: "Seller", icon: "👤", href: "/dashboard/admin/seller-requests" },
-    { label: "Products", icon: "📦", href: "/admin/products" },
-    { label: "Settings", icon: "⚙️", href: "/admin/settings" },
+    // { label: "Products", icon: "📦", href: "/dashboard/admin/products" },
+    // { label: "Settings", icon: "⚙️", href: "/dashboard/admin/settings" },
   ];
 
   // Determine active nav item based on current pathname

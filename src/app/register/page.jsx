@@ -3,6 +3,7 @@
 import { useState } from "react";
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
+import LoginButton from "../components/LoginButton";
 
 export default function RegisterPage() {
   const [form, setForm] = useState({
@@ -184,9 +185,10 @@ export default function RegisterPage() {
 
           <p className="mt-4 text-center text-sm text-base-content/70">
             Already have an account?{" "}
-            <a href="/login" className="text-primary underline">
+            {/* <a href="/login" className="text-primary underline">
               Log in
-            </a>
+            </a> */}
+            <LoginButton/>
           </p>
         </div>
       </div>

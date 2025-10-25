@@ -5,38 +5,44 @@ export const authOptions = {
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        username: { label: "Username", type: "text", placeholder: "jsmith" },
+        username: { label: "Email or Phone", type: "text", placeholder: "Email or Phone" },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        // console.log(credentials);
-        // Call your login API route, make sure URL is correct
-        const res = await fetch(`${process.env.NEXTAUTH_URL}/api/auth/login`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(credentials),
-        });
+        try {
+          // Normalize phone number: remove non-digit characters, ensure starts with +
+          let identifier = credentials.identifier || credentials.username || "";
+          const isPhone = /^\+?\d{8,15}$/.test(identifier.replace(/\s/g, ""));
+          if (isPhone && !identifier.startsWith("+")) {
+            identifier = `+${identifier.replace(/\D/g, "")}`;
+          }
 
-        const user = await res.json();
+          const res = await fetch(`${process.env.NEXTAUTH_URL}/api/auth/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ identifier, password: credentials.password }),
+          });
 
-        console.log("aakfhah", user);
+          const user = await res.json();
 
-        if (res.ok && user) {
-            // Make sure _id is string, not ObjectId
-        //   user._id = user._id ? user._id.toString() : null;
-          return user; // Must be an object, e.g. { id, name, email }
+          if (res.ok && user) {
+            // Return user object
+            return user;
+          }
+
+          return null;
+        } catch (error) {
+          console.error("Authorize error:", error);
+          return null;
         }
-
-        return null; // If login fails
       },
     }),
   ],
   session: {
-    strategy: "jwt", // or 'database' if you want DB sessions
+    strategy: "jwt",
   },
   callbacks: {
     async jwt({ token, user }) {
-      // Add user info to the token on login
       if (user) {
         token._id = user._id;
         token.email = user.email;
@@ -46,7 +52,6 @@ export const authOptions = {
       return token;
     },
     async session({ session, token }) {
-      // Add token info to session
       if (token) {
         session.user._id = token._id;
         session.user.email = token.email;

@@ -31,7 +31,10 @@ export default function Navbar() {
           {isAdmin && (
             <Link href="/dashboard/admin" className="hover:text-red-600">Dashboard</Link>
           )}
-          <Link href="/register" className="hover:text-red-600">Register</Link>
+          {/* Only show Register if user is not logged in */}
+          {!session && (
+            <Link href="/register" className="hover:text-red-600">Register</Link>
+          )}
 
           {/* Auth Buttons */}
           {status === "loading" ? null : session ? (
@@ -70,6 +73,10 @@ export default function Navbar() {
               <Link href="/dashboard/admin" className="hover:text-red-600" onClick={toggleMenu}>
                 Dashboard
               </Link>
+            )}
+            {/* Only show Register if user is not logged in */}
+            {!session && (
+              <Link href="/register" className="hover:text-red-600">Register</Link>
             )}
 
             {/* Mobile Auth */}
