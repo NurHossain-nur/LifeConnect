@@ -17,7 +17,7 @@ export const authOptions = {
             identifier = `+${identifier.replace(/\D/g, "")}`;
           }
 
-          const res = await fetch(`${process.env.NEXTAUTH_URL}/api/auth/login`, {
+          const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL ? process.env.NEXT_PUBLIC_BASE_URL : ""}/api/auth/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ identifier, password: credentials.password }),
