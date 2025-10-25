@@ -10,14 +10,20 @@ export const authOptions = {
       },
       async authorize(credentials) {
         try {
-          // Normalize phone number: remove non-digit characters, ensure starts with +
           let identifier = credentials.identifier || credentials.username || "";
           const isPhone = /^\+?\d{8,15}$/.test(identifier.replace(/\s/g, ""));
           if (isPhone && !identifier.startsWith("+")) {
             identifier = `+${identifier.replace(/\D/g, "")}`;
           }
 
-          const res = await fetch(`/api/auth/login`, {
+          // ✅ Dynamically detect absolute URL
+          const baseUrl =
+            process.env.NEXTAUTH_URL ||
+            (process.env.VERCEL_URL
+              ? `https://${process.env.VERCEL_URL}`
+              : "http://localhost:3000");
+
+          const res = await fetch(`${baseUrl}/api/auth/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ identifier, password: credentials.password }),
@@ -25,11 +31,11 @@ export const authOptions = {
 
           const user = await res.json();
 
-          if (res.ok && user) {
-            // Return user object
+          if (res.ok && user && !user.error) {
             return user;
           }
 
+          console.error("Authorize failed:", user?.error || "Unknown error");
           return null;
         } catch (error) {
           console.error("Authorize error:", error);
@@ -61,4 +67,5 @@ export const authOptions = {
       return session;
     },
   },
+  secret: process.env.NEXTAUTH_SECRET,
 };
