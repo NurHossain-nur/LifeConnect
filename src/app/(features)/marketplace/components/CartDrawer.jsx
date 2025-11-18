@@ -1,18 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useCart } from "../CartContext";
 
-export default function CartDrawer({
-  cart,
-  cartOpen,
-  setCartOpen,
-  updateQuantity,
-  removeFromCart,
-  checkoutForm,
-  setCheckoutForm,
-  handleCheckout,
-  checkoutLoading,
-}) {
+export default function CartDrawer() {
+  const {
+    cart,
+    cartOpen,
+    setCartOpen,
+    updateQuantity,
+    removeFromCart,
+    checkoutForm,
+    setCheckoutForm,
+    handleCheckout,
+    checkoutLoading,
+  } = useCart();
+
   const cartItems = Object.values(cart);
 
   const subtotal = cartItems.reduce((acc, item) => {
@@ -49,7 +51,10 @@ export default function CartDrawer({
           <p className="text-gray-500 text-center mt-10">Your cart is empty</p>
         ) : (
           cartItems.map(({ product, quantity }) => (
-            <div key={product._id} className="flex justify-between items-center border-b pb-2">
+            <div
+              key={product._id}
+              className="flex justify-between items-center border-b pb-2"
+            >
               <div className="flex items-center gap-3">
                 <img
                   src={product.images[0]}
@@ -62,6 +67,7 @@ export default function CartDrawer({
                     ${product.price - (product.discount || 0)} × {quantity} = $
                     {(product.price - (product.discount || 0)) * quantity}
                   </p>
+
                   {product.deliveryCharge > 0 && (
                     <p className="text-sm text-gray-500">
                       Delivery Charge: ${product.deliveryCharge}
@@ -69,13 +75,16 @@ export default function CartDrawer({
                   )}
                 </div>
               </div>
+
               <div className="flex flex-col items-end gap-2">
                 <input
                   type="number"
                   value={quantity}
                   min="1"
                   max={product.stock}
-                  onChange={(e) => updateQuantity(product._id, Number(e.target.value))}
+                  onChange={(e) =>
+                    updateQuantity(product._id, Number(e.target.value))
+                  }
                   className="w-16 px-2 py-1 border rounded focus:ring-2 focus:ring-red-400"
                 />
                 <button
@@ -90,56 +99,74 @@ export default function CartDrawer({
         )}
       </div>
 
-      {/* Checkout Form */}
+      {/* Checkout Section */}
       {cartItems.length > 0 && (
         <div className="p-4 border-t border-gray-200 space-y-3">
           <h3 className="font-semibold text-lg">Customer Details</h3>
+
           <input
             type="text"
             placeholder="Full Name"
             value={checkoutForm.name}
-            onChange={(e) => setCheckoutForm({ ...checkoutForm, name: e.target.value })}
+            onChange={(e) =>
+              setCheckoutForm({ ...checkoutForm, name: e.target.value })
+            }
             className="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-red-400"
           />
+
           <input
             type="email"
             placeholder="Email"
             value={checkoutForm.email}
-            onChange={(e) => setCheckoutForm({ ...checkoutForm, email: e.target.value })}
+            onChange={(e) =>
+              setCheckoutForm({ ...checkoutForm, email: e.target.value })
+            }
             className="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-red-400"
           />
+
           <input
             type="text"
             placeholder="Phone"
             value={checkoutForm.phone}
-            onChange={(e) => setCheckoutForm({ ...checkoutForm, phone: e.target.value })}
-            className="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-red-400"
-          />
-          <textarea
-            placeholder="Delivery Address"
-            value={checkoutForm.address}
-            onChange={(e) => setCheckoutForm({ ...checkoutForm, address: e.target.value })}
+            onChange={(e) =>
+              setCheckoutForm({ ...checkoutForm, phone: e.target.value })
+            }
             className="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-red-400"
           />
 
+          <textarea
+            placeholder="Delivery Address"
+            value={checkoutForm.address}
+            onChange={(e) =>
+              setCheckoutForm({ ...checkoutForm, address: e.target.value })
+            }
+            className="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-red-400"
+          />
+
+          {/* Totals */}
           <div className="flex justify-between mt-2">
             <span>Subtotal:</span>
             <span>${subtotal.toFixed(2)}</span>
           </div>
+
           <div className="flex justify-between">
             <span>Delivery Charges:</span>
             <span>${totalDeliveryCharge.toFixed(2)}</span>
           </div>
+
           <div className="flex justify-between font-bold text-lg">
             <span>Total:</span>
             <span>${total.toFixed(2)}</span>
           </div>
 
+          {/* Checkout Button */}
           <button
             onClick={handleCheckout}
             disabled={checkoutLoading}
             className={`w-full py-2 rounded text-white ${
-              checkoutLoading ? "bg-gray-400 cursor-not-allowed" : "bg-red-500 hover:bg-red-600"
+              checkoutLoading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-red-500 hover:bg-red-600"
             } transition`}
           >
             {checkoutLoading ? "Placing Order..." : "Place Order"}

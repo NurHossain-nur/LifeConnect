@@ -1,8 +1,10 @@
 "use client";
 import { useRouter } from "next/navigation";
+import { useCart } from "../CartContext";
 
-export default function ProductCard({ product, addToCart }) {
+export default function ProductCard({ product }) {
   const router = useRouter();
+  const { addToCart } = useCart();
 
   const openDetails = () => {
     router.push(`/marketplace/product/${product._id}`);
