@@ -130,57 +130,83 @@ export default function MarketplacePage() {
 
 
   const handleCheckout = async () => {
-    if (cartItems.length === 0) {
-      alert("Your cart is empty!");
-      return;
-    }
-  
-    // Simple validation
-    if (!checkoutForm.name || !checkoutForm.email || !checkoutForm.phone || !checkoutForm.address) {
-      alert("Please fill in all your details.");
-      return;
-    }
-  
-    try {
-      setCheckoutLoading(true);
-  
-      const orderPayload = {
-        customer: checkoutForm,
-        items: cartItems.map(({ product, quantity }) => ({
-          productId: product._id,
-          sellerId: product.sellerId,
-          quantity,
-          price: product.price - (product.discount || 0),
-          deliveryCharge: product.deliveryCharge || 0, // use product-specific delivery charge
-        })),
-        createdAt: new Date(),
-      };
-  
-      const res = await fetch("/api/marketplace/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(orderPayload),
-      });
-  
-      const data = await res.json();
-  
-      if (!res.ok) {
-        alert(data.message || "Failed to place order.");
-        setCheckoutLoading(false);
-        return;
-      }
-  
-      alert("Order placed successfully! Your seller will contact you soon.");
-      setCart({});
-      setCartOpen(false);
-      setCheckoutForm({ name: "", email: "", phone: "", address: "" });
-    } catch (error) {
-      console.error("Checkout error:", error);
-      alert("Something went wrong. Please try again.");
-    } finally {
+  if (cartItems.length === 0) {
+    alert("Your cart is empty!");
+    return;
+  }
+
+  // Simple validation
+  if (!checkoutForm.name || !checkoutForm.email || !checkoutForm.phone || !checkoutForm.address) {
+    alert("Please fill in all your details.");
+    return;
+  }
+
+  try {
+    setCheckoutLoading(true);
+
+    const orderPayload = {
+      customer: checkoutForm,
+      items: cartItems.map(({ product, quantity }) => ({
+        productId: product._id,
+        sellerId: product.sellerId,
+        quantity,
+        price: product.price - (product.discount || 0),
+        deliveryCharge: product.deliveryCharge || 0,
+      })),
+      createdAt: new Date(),
+    };
+
+    const res = await fetch("/api/marketplace/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(orderPayload),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.message || "Failed to place order.");
       setCheckoutLoading(false);
+      return;
     }
-  };
+
+    // ✅ Save order to localStorage
+    const savedOrders = JSON.parse(localStorage.getItem("myOrders") || "[]");
+
+    const orderRecord = {
+      orderId: data.orderId,
+      customer: checkoutForm,
+      items: cartItems.map(({ product, quantity }) => ({
+        productId: product._id,
+        name: product.name,
+        quantity,
+        price: product.price - (product.discount || 0),
+        deliveryCharge: product.deliveryCharge || 0,
+      })),
+      subtotal,
+      totalDeliveryCharge,
+      total,
+      status: "pending",
+      createdAt: new Date().toISOString(),
+    };
+
+    savedOrders.push(orderRecord);
+    localStorage.setItem("myOrders", JSON.stringify(savedOrders));
+
+    alert("Order placed successfully! Your seller will contact you soon.");
+
+    // Clear cart
+    setCart({});
+    setCartOpen(false);
+    setCheckoutForm({ name: "", email: "", phone: "", address: "" });
+  } catch (error) {
+    console.error("Checkout error:", error);
+    alert("Something went wrong. Please try again.");
+  } finally {
+    setCheckoutLoading(false);
+  }
+};
+
 
 
 
