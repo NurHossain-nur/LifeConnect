@@ -13,6 +13,7 @@ export default function ApplySellerPage() {
     phoneNumber: "",
     address: "",
     profileImage: null, // File object
+    bannerImage: null,  // New field for banner image
   });
 
   // Auto-fill name/email from session
@@ -28,8 +29,8 @@ export default function ApplySellerPage() {
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-    if (name === "profileImage") {
-      setFormData({ ...formData, profileImage: files[0] });
+    if (name === "profileImage" || name === "bannerImage") {
+      setFormData({ ...formData, [name]: files[0] });
     } else {
       setFormData({ ...formData, [name]: value });
     }
@@ -123,13 +124,33 @@ export default function ApplySellerPage() {
           className="w-full p-3 border rounded-md"
           required
         />
-        <input
-          type="file"
-          name="profileImage"
-          accept="image/*"
-          onChange={handleChange}
-          className="w-full p-3 border rounded-md"
-        />
+
+        {/* Profile Image */}
+        <div className="flex flex-col">
+          <label className="mb-1 font-medium text-gray-700">Profile Image (Shop Logo)</label>
+          <input
+            type="file"
+            name="profileImage"
+            accept="image/*"
+            onChange={handleChange}
+            className="w-full p-3 border rounded-md"
+          />
+          <small className="text-gray-500 mt-1">Recommended: square image, e.g., 150x150px</small>
+        </div>
+          
+        {/* Banner Image */}
+        <div className="flex flex-col mt-4">
+          <label className="mb-1 font-medium text-gray-700">Banner Image (Shop Banner)</label>
+          <input
+            type="file"
+            name="bannerImage"
+            accept="image/*"
+            onChange={handleChange}
+            className="w-full p-3 border rounded-md"
+          />
+          <small className="text-gray-500 mt-1">Recommended: wide image, e.g., 1200x300px</small>
+        </div>
+
         <button
           type="submit"
           className="w-full bg-red-500 text-white py-2 rounded hover:bg-red-600 transition"

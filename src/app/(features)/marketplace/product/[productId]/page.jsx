@@ -1,31 +1,37 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useCart } from "../../CartContext"; // <-- USE CONTEXT
+import { useCart } from "../../CartContext";
+import Link from "next/link";
 
 export default function ProductDetailsPage({ params }) {
   const { productId } = params;
-
-  // --- Cart Context ---
-  const { addToCart } = useCart();   // <-- NEW
+  const { addToCart } = useCart();
 
   const [product, setProduct] = useState(null);
   const [mainImage, setMainImage] = useState("");
   const [quantity, setQuantity] = useState(1);
+  const [seller, setSeller] = useState(null); // <-- seller state
+
   const [currentPage, setCurrentPage] = useState(1);
   const reviewsPerPage = 5;
 
-  // Review Form
   const [reviewName, setReviewName] = useState("");
   const [reviewComment, setReviewComment] = useState("");
   const [reviewRating, setReviewRating] = useState(5);
 
+  // Fetch product
   useEffect(() => {
     async function fetchProduct() {
       const res = await fetch(`/api/marketplace/products/${productId}`);
       const data = await res.json();
       setProduct(data);
       setMainImage(data.images[0]);
+
+      // Fetch seller info
+      const sellerRes = await fetch(`/api/marketplace/sellers/${data.sellerId}`);
+      const sellerData = await sellerRes.json();
+      setSeller(sellerData);
     }
     fetchProduct();
   }, [productId]);
@@ -34,12 +40,10 @@ export default function ProductDetailsPage({ params }) {
     return <p className="text-center mt-20 text-red-600">Loading product...</p>;
   }
 
-  // --- Add to Cart handler ---
   const handleAddToCart = () => {
-    addToCart(product, quantity);  // <-- USE CONTEXT FUNCTION
+    addToCart(product, quantity);
   };
 
-  // --- Review Submit ---
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
     const res = await fetch(`/api/marketplace/products/${productId}/reviews`, {
@@ -64,7 +68,6 @@ export default function ProductDetailsPage({ params }) {
     }
   };
 
-  // Average rating
   const averageRating = product.reviews?.length
     ? product.reviews.reduce((sum, r) => sum + r.rating, 0) /
       product.reviews.length
@@ -82,14 +85,13 @@ export default function ProductDetailsPage({ params }) {
   return (
     <div className="max-w-5xl mx-auto py-10 px-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-        
+
         {/* Images */}
         <div>
           <img
             src={mainImage}
             className="w-full h-96 object-cover rounded-lg shadow"
           />
-
           <div className="flex gap-3 mt-4 overflow-x-auto">
             {product.images.map((img, idx) => (
               <img
@@ -104,11 +106,12 @@ export default function ProductDetailsPage({ params }) {
           </div>
         </div>
 
-        {/* Info */}
+        {/* Product Info */}
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-3xl font-bold">{product.name}</h1>
 
+            {/* Average Rating */}
             {product.reviews?.length > 0 && (
               <div className="flex items-center gap-1 text-yellow-500">
                 {Array.from({ length: 5 }, (_, i) => (
@@ -126,16 +129,25 @@ export default function ProductDetailsPage({ params }) {
           <p className="text-red-600 text-2xl font-semibold mt-5">
             ${product.price - (product.discount || 0)}
           </p>
-
           {product.discount > 0 && (
             <p className="text-green-600 mt-1">
               Discount: ${product.discount}
             </p>
           )}
+          <p className="mt-3 text-gray-700">Stock: {product.stock} units</p>
 
-          <p className="mt-3 text-gray-700">
-            Stock: {product.stock} units
-          </p>
+          {/* Seller Info */}
+          {seller && (
+            <Link href={`/marketplace/shop/${product.sellerId}`} className="mt-4 flex items-center gap-2 cursor-pointer hover:opacity-80 transition">
+              <img
+                src={seller.profileImage}
+                alt={seller.shopName}
+                className="w-10 h-10 rounded-full border transition-transform duration-200 hover:scale-110"
+              />
+              <p className="text-gray-700 font-medium">{seller.shopName}</p>
+              <span className="text-blue-500 ml-1 text-sm">View Shop →</span>
+            </Link>
+          )}
 
           {/* Add to Cart */}
           <div className="mt-6 flex items-center gap-2">
@@ -147,7 +159,6 @@ export default function ProductDetailsPage({ params }) {
               onChange={(e) => setQuantity(Number(e.target.value))}
               className="w-20 px-2 py-1 border rounded focus:ring-2 focus:ring-red-400"
             />
-
             <button
               onClick={handleAddToCart}
               className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 transition"
@@ -208,7 +219,6 @@ export default function ProductDetailsPage({ params }) {
           className="mt-6 p-4 border rounded-lg bg-white"
         >
           <h3 className="font-semibold mb-2">Leave a Review</h3>
-
           <input
             type="text"
             value={reviewName}
@@ -217,7 +227,6 @@ export default function ProductDetailsPage({ params }) {
             className="w-full border px-2 py-1 rounded mb-2"
             required
           />
-
           <textarea
             value={reviewComment}
             onChange={(e) => setReviewComment(e.target.value)}
@@ -225,8 +234,6 @@ export default function ProductDetailsPage({ params }) {
             className="w-full border px-2 py-1 rounded mb-2"
             required
           />
-
-          {/* Star Rating */}
           <div className="flex items-center gap-1 mb-3">
             <span>Rating:</span>
             {Array.from({ length: 5 }, (_, i) => i + 1).map((star) => (
@@ -241,7 +248,6 @@ export default function ProductDetailsPage({ params }) {
               </span>
             ))}
           </div>
-
           <button
             type="submit"
             className="bg-blue-500 text-white py-1 px-4 rounded hover:bg-blue-600"

@@ -21,6 +21,7 @@ export async function POST(req) {
     const phoneNumber = formData.get("phoneNumber");
     const address = formData.get("address");
     const profileImageFile = formData.get("profileImage");
+    const bannerImageFile = formData.get("bannerImage"); // new field
 
     if (!shopName || !description || !phoneNumber || !address) {
       return NextResponse.json(
@@ -29,23 +30,29 @@ export async function POST(req) {
       );
     }
 
-    // ✅ Upload profile image to Cloudinary (if provided)
-    let profileImageUrl = "";
-    if (profileImageFile && profileImageFile.size > 0) {
-      const arrayBuffer = await profileImageFile.arrayBuffer();
+    // Helper function to upload image to Cloudinary
+    const uploadToCloudinary = async (file, folder) => {
+      if (!file || file.size === 0) return "";
+      const arrayBuffer = await file.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
 
       const uploadResult = await new Promise((resolve, reject) => {
         cloudinary.uploader
-          .upload_stream({ folder: "seller_profiles" }, (error, result) => {
+          .upload_stream({ folder }, (error, result) => {
             if (error) reject(error);
             else resolve(result);
           })
           .end(buffer);
       });
 
-      profileImageUrl = uploadResult.secure_url;
-    }
+      return uploadResult.secure_url;
+    };
+
+    // ✅ Upload profile image
+    const profileImageUrl = await uploadToCloudinary(profileImageFile, "seller_profiles");
+
+    // ✅ Upload banner image
+    const bannerImageUrl = await uploadToCloudinary(bannerImageFile, "seller_banners");
 
     // ✅ Connect to "sellers" collection
     const sellersCollection = dbConnect(collectionNamesObj.sellersCollection);
@@ -68,7 +75,8 @@ export async function POST(req) {
       description,
       phoneNumber,
       address,
-      profileImage: profileImageUrl, // store uploaded image URL
+      profileImage: profileImageUrl,
+      bannerImage: bannerImageUrl, // store uploaded banner URL
       status: "pending",
       createdAt: new Date(),
     };

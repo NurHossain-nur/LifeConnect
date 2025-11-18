@@ -1,12 +1,20 @@
 import { NextResponse } from "next/server";
 import dbConnect, { collectionNamesObj } from "@/lib/db";
+import { ObjectId } from "mongodb";
 
-export async function GET() {
+export async function GET(req) {
   try {
+    const url = new URL(req.url);
+    const sellerId = url.searchParams.get("sellerId"); // get ?sellerId=...
+console.log(sellerId);
     const productsCollection = dbConnect(collectionNamesObj.allSellersProductsCollection);
 
-    // Fetch only approved and active products
-    const products = await productsCollection.find({ isApproved: true, status: "active" }).toArray();
+    const query = { isApproved: true, status: "active" };
+    if (sellerId) {
+      query.sellerId = sellerId;
+    }
+
+    const products = await productsCollection.find(query).toArray();
 
     // Convert MongoDB ObjectId to string
     const formattedProducts = products.map((p) => ({
