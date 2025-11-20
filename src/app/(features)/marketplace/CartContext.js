@@ -89,8 +89,12 @@ export function CartProvider({ children }) {
           productId: product._id,
           sellerId: product.sellerId,
           quantity,
-          price: product.price - (product.discount || 0),
+          price: product.price,
+          discount: product.discount || 0,
+          finalPrice: product.price - (product.discount || 0),
           deliveryCharge: product.deliveryCharge || 0,
+          image: product.images?.[0] || "/no-image.png",
+          name: product.name,
         })),
         createdAt: new Date(),
       };

@@ -78,12 +78,19 @@ export default function ProductCard({ product }) {
             )}
           </div>
 
-          <p className="text-red-500 font-medium mt-2">
-            ${product.price - (product.discount || 0)}
-          </p>
-          {product.discount > 0 && (
-            <p className="text-green-600 text-sm">Discount: ${product.discount}</p>
-          )}
+          <div className="mt-2">
+            {product.discount > 0 ? (
+              <>
+                <p className="font-medium text-red-500">
+                  <span className="line-through text-gray-400 mr-2">${product.price}</span>
+                  <span>${(product.price - product.discount).toFixed(2)}</span>
+                </p>
+                <p className="text-green-600 text-sm">You save: ${product.discount.toFixed(2)}</p>
+              </>
+            ) : (
+              <p className="font-medium text-red-500">${product.price.toFixed(2)}</p>
+            )}
+          </div>
           <p className="text-gray-600 text-sm mt-1">Stock: {product.stock} units</p>
         </div>
 

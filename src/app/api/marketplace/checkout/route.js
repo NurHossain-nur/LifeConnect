@@ -71,6 +71,9 @@ export async function POST(req) {
         quantity,
         price,
         deliveryCharge,
+        image: product.images?.[0] || null,
+        name: product.name,
+        discount: product.discount || 0,
         status: "pending",
       });
     }
