@@ -26,8 +26,8 @@ export async function POST(req) {
     }
 
     // ✅ Get DB collections
-    const sellersCollection = dbConnect(collectionNamesObj.sellersCollection);
-    const usersCollection = dbConnect(collectionNamesObj.usersCollection);
+    const sellersCollection = await dbConnect(collectionNamesObj.sellersCollection);
+    const usersCollection = await dbConnect(collectionNamesObj.usersCollection);
 
     // ✅ Find the application
     const application = await sellersCollection.findOne({ userId });
@@ -48,6 +48,24 @@ export async function POST(req) {
         { _id: new ObjectId(userId) },
         { $set: { role: "seller" } }
       );
+
+      // Handle commission if referred
+      if (application.referredBy) {
+        const commissionAmount = 250; // 50% of 500
+        await sellersCollection.updateOne(
+          { userId: application.referredBy },
+          {
+            $push: {
+              commissions: {
+                referredUserId: application.userId,
+                amount: commissionAmount,
+                status: "pending", // Pending until admin pays manually
+                createdAt: new Date(),
+              },
+            },
+          }
+        );
+      }
 
       return NextResponse.json({ message: "✅ Seller approved successfully!" }, { status: 200 });
     }

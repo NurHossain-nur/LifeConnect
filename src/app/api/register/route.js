@@ -13,7 +13,7 @@ export const POST = async (req) => {
       );
     }
 
-    const usersCollection = dbConnect(collectionNamesObj.usersCollection); // assuming your collection is usersCollection
+    const usersCollection = await dbConnect(collectionNamesObj.usersCollection); // assuming your collection is usersCollection
 
     // Optional: check if user already exists (by email)
     const existingUser = await usersCollection.findOne({ email });

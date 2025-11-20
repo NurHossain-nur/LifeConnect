@@ -11,7 +11,7 @@ export async function GET() {
       return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
     }
 
-    const sellersCollection = dbConnect(collectionNamesObj.sellersCollection);
+    const sellersCollection = await dbConnect(collectionNamesObj.sellersCollection);
     const seller = await sellersCollection.findOne({ userId: String(session.user._id) });
 
     if (!seller) {

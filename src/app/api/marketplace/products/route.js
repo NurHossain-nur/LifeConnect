@@ -7,7 +7,7 @@ export async function GET(req) {
     const url = new URL(req.url);
     const sellerId = url.searchParams.get("sellerId"); // get ?sellerId=...
 console.log(sellerId);
-    const productsCollection = dbConnect(collectionNamesObj.allSellersProductsCollection);
+    const productsCollection = await dbConnect(collectionNamesObj.allSellersProductsCollection);
 
     const query = { isApproved: true, status: "active" };
     if (sellerId) {

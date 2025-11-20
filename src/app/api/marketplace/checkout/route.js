@@ -27,9 +27,9 @@ export async function POST(req) {
     }
 
     // 4️⃣ Connect to DB
-    const productsCollection = dbConnect(collectionNamesObj.allSellersProductsCollection);
-    const usersCollection = dbConnect(collectionNamesObj.usersCollection);
-    const ordersCollection = dbConnect(collectionNamesObj.orderCollection);
+    const productsCollection = await dbConnect(collectionNamesObj.allSellersProductsCollection);
+    const usersCollection = await dbConnect(collectionNamesObj.usersCollection);
+    const ordersCollection = await dbConnect(collectionNamesObj.orderCollection);
 
     // 5️⃣ If user is logged in → use DB user data
     //     else → guest checkout (no DB lookup)

@@ -3,16 +3,16 @@ import { getServerSession } from "next-auth";
 import dbConnect, { collectionNamesObj } from "@/lib/db";
 import { authOptions } from "@/lib/authOptions";
 import cloudinary from "@/lib/cloudinary";
+import crypto from "crypto"; // Node built-in for code generation
+import { ObjectId } from "mongodb"; // For queries
 
 export async function POST(req) {
   try {
     const session = await getServerSession(authOptions);
-
     if (!session?.user?._id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // ✅ Parse FormData
     const formData = await req.formData();
     const name = formData.get("name");
     const email = formData.get("email");
@@ -21,21 +21,21 @@ export async function POST(req) {
     const phoneNumber = formData.get("phoneNumber");
     const address = formData.get("address");
     const profileImageFile = formData.get("profileImage");
-    const bannerImageFile = formData.get("bannerImage"); // new field
+    const bannerImageFile = formData.get("bannerImage");
+    const paymentMethod = formData.get("paymentMethod");
+    const senderNumber = formData.get("senderNumber");
+    const transactionId = formData.get("transactionId");
+    const paymentProofFile = formData.get("paymentProof");
+    let referralCode = formData.get("referralCode")?.toUpperCase() || ""; // Optional, uppercase
 
-    if (!shopName || !description || !phoneNumber || !address) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      );
+    if (!shopName || !description || !phoneNumber || !address || !paymentMethod || !senderNumber || !transactionId) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    // Helper function to upload image to Cloudinary
     const uploadToCloudinary = async (file, folder) => {
-      if (!file || file.size === 0) return "";
+      if (!file || !(file instanceof File) || file.size === 0) return ""; // Fix: Check if it's a valid File object
       const arrayBuffer = await file.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
-
       const uploadResult = await new Promise((resolve, reject) => {
         cloudinary.uploader
           .upload_stream({ folder }, (error, result) => {
@@ -44,29 +44,43 @@ export async function POST(req) {
           })
           .end(buffer);
       });
-
       return uploadResult.secure_url;
     };
 
-    // ✅ Upload profile image
     const profileImageUrl = await uploadToCloudinary(profileImageFile, "seller_profiles");
-
-    // ✅ Upload banner image
     const bannerImageUrl = await uploadToCloudinary(bannerImageFile, "seller_banners");
+    const paymentProofUrl = await uploadToCloudinary(paymentProofFile, "seller_payment_proofs");
 
-    // ✅ Connect to "sellers" collection
-    const sellersCollection = dbConnect(collectionNamesObj.sellersCollection);
+    const sellersCollection = await dbConnect(collectionNamesObj.sellersCollection);
 
-    // ✅ Check if the user already applied
     const existingApp = await sellersCollection.findOne({ userId: session.user._id });
     if (existingApp) {
-      return NextResponse.json(
-        { error: "You have already applied as a seller." },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "You have already applied as a seller." }, { status: 400 });
     }
 
-    // ✅ Create new application object
+    let referredBy = null;
+    if (referralCode) {
+      const referrer = await sellersCollection.findOne({
+        referralCode,
+        status: "approved", // Only approved sellers can refer
+      });
+      if (referrer) {
+        referredBy = referrer.userId;
+      } else {
+        return NextResponse.json({ error: "Invalid referral code." }, { status: 400 });
+      }
+    }
+
+    // Generate unique referral code (8 chars, uppercase hex)
+    let newReferralCode;
+    let codeExists = true;
+    while (codeExists) {
+      newReferralCode = crypto.randomBytes(4).toString("hex").toUpperCase();
+      codeExists = await sellersCollection.findOne({ referralCode: newReferralCode });
+    }
+
+    const FEE_AMOUNT = 500;
+
     const newApplication = {
       userId: session.user._id,
       name,
@@ -76,19 +90,28 @@ export async function POST(req) {
       phoneNumber,
       address,
       profileImage: profileImageUrl,
-      bannerImage: bannerImageUrl, // store uploaded banner URL
+      bannerImage: bannerImageUrl,
+      paymentDetails: {
+        amount: FEE_AMOUNT,
+        method: paymentMethod,
+        senderNumber,
+        transactionId,
+        proofUrl: paymentProofUrl,
+      },
+      referredBy, // ObjectId or null
+      referralCode: newReferralCode,
+      commissions: [], // Array for future commissions
       status: "pending",
       createdAt: new Date(),
     };
 
-    // ✅ Insert into collection
     const result = await sellersCollection.insertOne(newApplication);
 
     return NextResponse.json(
       {
-        message: "Application submitted successfully",
+        message: "Application submitted successfully! Awaiting payment verification.",
         applicationId: result.insertedId,
-        application: newApplication,
+        referralCode: newReferralCode, // Return to frontend
       },
       { status: 201 }
     );

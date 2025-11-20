@@ -55,7 +55,7 @@ export async function POST(request) {
     }
 
     // ✅ Get seller info from "sellers" collection
-    const sellersCollection = dbConnect(collectionNamesObj.sellersCollection);
+    const sellersCollection = await dbConnect(collectionNamesObj.sellersCollection);
     const seller = await sellersCollection.findOne({
       userId: session.user._id,
       status: "approved", // only approved sellers can add products
@@ -69,7 +69,7 @@ export async function POST(request) {
     }
 
     // ✅ Connect to product collection
-    const productsCollection = dbConnect(
+    const productsCollection = await dbConnect(
       collectionNamesObj.allSellersProductsCollection
     );
 

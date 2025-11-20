@@ -26,8 +26,8 @@ export async function PUT(request) {
     }
 
     // Connect to collections
-    const sellersCollection = dbConnect(collectionNamesObj.sellersCollection);
-    const productsCollection = dbConnect(
+    const sellersCollection = await dbConnect(collectionNamesObj.sellersCollection);
+    const productsCollection = await dbConnect(
       collectionNamesObj.allSellersProductsCollection
     );
 

@@ -16,7 +16,7 @@ export async function GET() {
       return NextResponse.json({ error: "Access denied" }, { status: 403 });
     }
 
-    const sellersCollection = dbConnect(collectionNamesObj.sellersCollection);
+    const sellersCollection = await dbConnect(collectionNamesObj.sellersCollection);
     const applications = await sellersCollection.find().toArray();
 
     return NextResponse.json({ applications }, { status: 200 });

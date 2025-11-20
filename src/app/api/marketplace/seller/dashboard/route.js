@@ -15,9 +15,9 @@ export async function GET() {
     }
 
     // 1️⃣ DB Collections
-    const sellersCollection = dbConnect(collectionNamesObj.sellersCollection);
-    const productsCollection = dbConnect(collectionNamesObj.allSellersProductsCollection);
-    const ordersCollection = dbConnect(collectionNamesObj.orderCollection);
+    const sellersCollection = await dbConnect(collectionNamesObj.sellersCollection);
+    const productsCollection = await dbConnect(collectionNamesObj.allSellersProductsCollection);
+    const ordersCollection = await dbConnect(collectionNamesObj.orderCollection);
 
     // 2️⃣ Find seller profile
     const seller = await sellersCollection.findOne({ userId: String(session.user._id) });

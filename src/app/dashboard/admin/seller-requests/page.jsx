@@ -61,63 +61,79 @@ export default function SellerRequestsPage() {
       {applications.length === 0 ? (
         <p className="text-center text-gray-500">No applications found.</p>
       ) : (
-        <table className="w-full border-collapse border border-gray-200">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="border p-2 text-left">Name</th>
-              <th className="border p-2 text-left">Email</th>
-              <th className="border p-2 text-left">Shop Name</th>
-              <th className="border p-2 text-left">Status</th>
-              <th className="border p-2 text-center">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {applications.map((app) => (
-              <tr key={app._id} className="hover:bg-gray-50">
-                <td className="border p-2">{app.name}</td>
-                <td className="border p-2">{app.email}</td>
-                <td className="border p-2">{app.shopName}</td>
-                <td
-                  className={`border p-2 font-medium ${
+        <div className="overflow-x-auto">
+          <table className="min-w-full border-collapse border border-gray-200 lg:table table-auto">
+            <thead className="bg-gray-100 text-black hidden lg:table-header-group">
+              <tr>
+                <th className="border p-2 text-left">Name</th>
+                <th className="border p-2 text-left">Email</th>
+                <th className="border p-2 text-left">Shop Name</th>
+                <th className="border p-2 text-left">Referral Code</th>
+                <th className="border p-2 text-left">Payment Method</th>
+                <th className="border p-2 text-left">Transaction ID</th>
+                <th className="border p-2 text-left">Status</th>
+                <th className="border p-2 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="block lg:table-row-group">
+              {applications.map((app) => (
+                <tr key={app._id} className="block lg:table-row mb-4 lg:mb-0 border-b lg:border-none hover:bg-gray-50 flex flex-col lg:table-row">
+                  <td className="block lg:table-cell border p-2 before:content-['Name:'] before:font-bold before:mr-2 lg:before:content-none">{app.name}</td>
+                  <td className="block lg:table-cell border p-2 before:content-['Email:'] before:font-bold before:mr-2 lg:before:content-none">{app.email}</td>
+                  <td className="block lg:table-cell border p-2 before:content-['Shop_Name:'] before:font-bold before:mr-2 lg:before:content-none">{app.shopName}</td>
+                  <td className="block lg:table-cell border p-2 before:content-['Referral_Code:'] before:font-bold before:mr-2 lg:before:content-none">{app.referralCode}</td>
+                  <td className="block lg:table-cell border p-2 before:content-['Payment_Method:'] before:font-bold before:mr-2 lg:before:content-none">{app.paymentDetails?.method || 'N/A'}</td>
+                  <td className="block lg:table-cell border p-2 before:content-['Transaction_ID:'] before:font-bold before:mr-2 lg:before:content-none">{app.paymentDetails?.transactionId || 'N/A'}</td>
+                  <td className={`block lg:table-cell border p-2 font-medium before:content-['Status:'] before:font-bold before:mr-2 lg:before:content-none ${
                     app.status === "approved"
                       ? "text-green-600"
                       : app.status === "rejected"
                       ? "text-red-600"
                       : "text-yellow-500"
-                  }`}
-                >
-                  {app.status}
-                </td>
-                <td className="border p-2 text-center">
-                  <div className="flex justify-center gap-2">
-                    {app.status === "pending" && (
-                      <>
-                        <button
-                          onClick={() => handleAction(app.userId, "approve")}
-                          className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                  }`}>
+                    {app.status}
+                  </td>
+                  <td className="block lg:table-cell border p-2 text-center before:content-['Actions:'] before:font-bold before:mr-2 lg:before:content-none">
+                    <div className="flex justify-center gap-2">
+                      {app.status === "pending" && (
+                        <>
+                          <button
+                            onClick={() => handleAction(app.userId, "approve")}
+                            className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                          >
+                            Approve
+                          </button>
+                          <button
+                            onClick={() => handleAction(app.userId, "reject")}
+                            className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                          >
+                            Reject
+                          </button>
+                        </>
+                      )}
+                      {app.paymentDetails?.proofUrl && (
+                        <a
+                          href={app.paymentDetails.proofUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
                         >
-                          Approve
-                        </button>
-                        <button
-                          onClick={() => handleAction(app.userId, "reject")}
-                          className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                        >
-                          Reject
-                        </button>
-                      </>
-                    )}
-                    <button
-                      onClick={() => window.location.href = `/dashboard/admin/seller/${app.userId}`}
-                      className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                    >
-                      Details
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                          View Proof
+                        </a>
+                      )}
+                      <button
+                        onClick={() => window.location.href = `/dashboard/admin/seller/${app.userId}`}
+                        className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                      >
+                        Details
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

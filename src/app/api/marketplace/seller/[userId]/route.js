@@ -3,7 +3,7 @@ import { ObjectId } from "mongodb";
 
 export async function GET(req, context) {
   const { params } = await context;
-  const userId = params.userId;
+  const userId = await params.userId;
 
   try {
     const sellersCol = await dbConnect(collectionNamesObj.sellersCollection);
@@ -77,6 +77,11 @@ export async function GET(req, context) {
         phoneNumber: seller.phoneNumber,
         address: seller.address,
         profileImage: seller.profileImage,
+        bannerImage: seller.bannerImage, // Added
+        paymentDetails: seller.paymentDetails, // Added
+        referredBy: seller.referredBy, // Added
+        referralCode: seller.referralCode, // Added
+        commissions: seller.commissions, // Added
         status: seller.status,
         createdAt: seller.createdAt,
         approvedAt: seller.approvedAt,

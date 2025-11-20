@@ -62,6 +62,75 @@ export default function SellerDetailsPage() {
         </div>
       </div>
 
+      {/* Application Details */}
+      <h2 className="text-2xl font-semibold mb-4">Application Details</h2>
+      <div className="bg-gray-50 p-6 rounded shadow-sm mb-8">
+        <p className="text-gray-700 mb-2"><strong>Description:</strong> {seller.description}</p>
+        <p className="text-gray-700 mb-2"><strong>Phone:</strong> {seller.phoneNumber}</p>
+        <p className="text-gray-700 mb-4"><strong>Address:</strong> {seller.address}</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {seller.profileImage && (
+            <div>
+              <p className="text-gray-500 text-sm mb-1">Profile Image</p>
+              <img src={seller.profileImage} alt="Profile" className="w-full h-auto rounded" />
+            </div>
+          )}
+          {seller.bannerImage && (
+            <div>
+              <p className="text-gray-500 text-sm mb-1">Banner Image</p>
+              <img src={seller.bannerImage} alt="Banner" className="w-full h-auto rounded" />
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Payment Details */}
+      <h2 className="text-2xl font-semibold mb-4">Payment Details</h2>
+      <div className="bg-gray-50 p-6 rounded shadow-sm mb-8">
+        <p className="text-gray-700 mb-2"><strong>Amount:</strong> ${seller.paymentDetails?.amount || 'N/A'}</p>
+        <p className="text-gray-700 mb-2"><strong>Method:</strong> {seller.paymentDetails?.method || 'N/A'}</p>
+        <p className="text-gray-700 mb-2"><strong>Sender Number:</strong> {seller.paymentDetails?.senderNumber || 'N/A'}</p>
+        <p className="text-gray-700 mb-4"><strong>Transaction ID:</strong> {seller.paymentDetails?.transactionId || 'N/A'}</p>
+        {seller.paymentDetails?.proofUrl && (
+          <div>
+            <p className="text-gray-500 text-sm mb-1">Payment Proof</p>
+            <img src={seller.paymentDetails.proofUrl} alt="Proof" className="w-full max-w-md h-auto rounded" />
+          </div>
+        )}
+      </div>
+
+      {/* Referral & Commissions */}
+      <h2 className="text-2xl font-semibold mb-4">Referral & Commissions</h2>
+      <div className="bg-gray-50 p-6 rounded shadow-sm mb-8">
+        <p className="text-gray-700 mb-2"><strong>Referral Code:</strong> {seller.referralCode || 'N/A'}</p>
+        <p className="text-gray-700 mb-4"><strong>Referred By:</strong> {seller.referredBy || 'None'}</p>
+        <h3 className="text-xl font-medium mb-2">Commissions</h3>
+        {seller.commissions?.length > 0 ? (
+          <table className="min-w-full table-auto border-collapse border border-gray-200">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="border px-4 py-2 text-left">Referred User ID</th>
+                <th className="border px-4 py-2 text-left">Amount</th>
+                <th className="border px-4 py-2 text-left">Status</th>
+                <th className="border px-4 py-2 text-left">Created At</th>
+              </tr>
+            </thead>
+            <tbody>
+              {seller.commissions.map((comm, index) => (
+                <tr key={index} className="hover:bg-gray-50">
+                  <td className="border px-4 py-2">{comm.referredUserId}</td>
+                  <td className="border px-4 py-2">${comm.amount}</td>
+                  <td className="border px-4 py-2">{comm.status}</td>
+                  <td className="border px-4 py-2">{new Date(comm.createdAt).toLocaleString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p className="text-gray-500">No commissions yet.</p>
+        )}
+      </div>
+
       {/* Products Table */}
       <h2 className="text-2xl font-semibold mb-4">Products</h2>
       <div className="overflow-x-auto mb-8">

@@ -29,7 +29,7 @@ export const GET = async (req) => {
     ];
   }
 
-    const donorsCollection = dbConnect(collectionNamesObj.donorsCollection);
+    const donorsCollection = await dbConnect(collectionNamesObj.donorsCollection);
     const donors = await donorsCollection.find({}).toArray();
     return NextResponse.json(donors);
 }
@@ -37,7 +37,7 @@ export const GET = async (req) => {
 
 export const POST = async (req) => {
     const body = await req.json();
-    const donorsCollection = dbConnect(collectionNamesObj.donorsCollection);
+    const donorsCollection = await dbConnect(collectionNamesObj.donorsCollection);
     const result = await donorsCollection.insertOne(body);
 
     return NextResponse.json(result);

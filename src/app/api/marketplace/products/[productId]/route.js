@@ -10,7 +10,7 @@ export async function GET(req, { params }) {
   }
 
   try {
-    const productsCollection = dbConnect(collectionNamesObj.allSellersProductsCollection);
+    const productsCollection = await dbConnect(collectionNamesObj.allSellersProductsCollection);
 
     const product = await productsCollection.findOne({
       _id: new ObjectId(productId),

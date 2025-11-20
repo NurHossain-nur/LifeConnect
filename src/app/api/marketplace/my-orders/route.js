@@ -13,8 +13,8 @@ export async function GET() {
       );
     }
 
-    const ordersCollection = dbConnect(collectionNamesObj.orderCollection);
-    const productsCollection = dbConnect(collectionNamesObj.allSellersProductsCollection);
+    const ordersCollection = await dbConnect(collectionNamesObj.orderCollection);
+    const productsCollection = await dbConnect(collectionNamesObj.allSellersProductsCollection);
 
     // ✅ Fetch all orders for this user
     const userOrders = await ordersCollection

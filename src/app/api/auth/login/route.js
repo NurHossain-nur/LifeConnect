@@ -53,7 +53,7 @@ export const POST = async (req) => {
       normalizedIdentifier = `+${identifier.replace(/\D/g, "")}`;
     }
 
-    const usersCollection = dbConnect(collectionNamesObj.usersCollection);
+    const usersCollection = await dbConnect(collectionNamesObj.usersCollection);
 
     // Find user by email OR phone
     const user = await usersCollection.findOne({

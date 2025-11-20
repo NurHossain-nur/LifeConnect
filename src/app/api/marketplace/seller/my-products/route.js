@@ -14,7 +14,7 @@ export async function GET(request) {
       );
     }
 
-    const sellersCollection = dbConnect(collectionNamesObj.sellersCollection);
+    const sellersCollection = await dbConnect(collectionNamesObj.sellersCollection);
 
     // 1️⃣ Find the seller record linked to this logged-in user
     const seller = await sellersCollection.findOne({
@@ -29,7 +29,7 @@ export async function GET(request) {
       );
     }
 
-    const productsCollection = dbConnect(
+    const productsCollection = await dbConnect(
       collectionNamesObj.allSellersProductsCollection
     );
 
@@ -71,7 +71,7 @@ export async function DELETE(request) {
       );
     }
 
-    const sellersCollection = dbConnect(collectionNamesObj.sellersCollection);
+    const sellersCollection = await dbConnect(collectionNamesObj.sellersCollection);
 
     // 1️⃣ Get seller record from session
     const seller = await sellersCollection.findOne({
@@ -86,7 +86,7 @@ export async function DELETE(request) {
       );
     }
 
-    const productsCollection = dbConnect(
+    const productsCollection = await dbConnect(
       collectionNamesObj.allSellersProductsCollection
     );
 
@@ -132,7 +132,7 @@ export async function PATCH(request) {
       );
     }
 
-    const sellersCollection = dbConnect(collectionNamesObj.sellersCollection);
+    const sellersCollection = await dbConnect(collectionNamesObj.sellersCollection);
 
     // 1️⃣ Get seller record from session
     const seller = await sellersCollection.findOne({
@@ -147,7 +147,7 @@ export async function PATCH(request) {
       );
     }
 
-    const productsCollection = dbConnect(
+    const productsCollection = await dbConnect(
       collectionNamesObj.allSellersProductsCollection
     );
 

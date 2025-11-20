@@ -14,9 +14,9 @@ export async function GET() {
       );
     }
 
-    const sellersCollection = dbConnect(collectionNamesObj.sellersCollection);
-    const ordersCollection = dbConnect(collectionNamesObj.orderCollection);
-    const productsCollection = dbConnect(collectionNamesObj.allSellersProductsCollection);
+    const sellersCollection = await dbConnect(collectionNamesObj.sellersCollection);
+    const ordersCollection = await dbConnect(collectionNamesObj.orderCollection);
+    const productsCollection = await dbConnect(collectionNamesObj.allSellersProductsCollection);
 
     // ✅ Step 1: Find the seller document using userId from session
     const sellerDoc = await sellersCollection.findOne({
@@ -103,8 +103,8 @@ export async function PATCH(req) {
       );
     }
 
-    const sellersCollection = dbConnect(collectionNamesObj.sellersCollection);
-    const ordersCollection = dbConnect(collectionNamesObj.orderCollection);
+    const sellersCollection = await dbConnect(collectionNamesObj.sellersCollection);
+    const ordersCollection = await dbConnect(collectionNamesObj.orderCollection);
 
     // ✅ Find the seller document
     const sellerDoc = await sellersCollection.findOne({
