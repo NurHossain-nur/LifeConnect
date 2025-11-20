@@ -26,8 +26,8 @@ export default function Navbar() {
         <nav className="hidden md:flex space-x-6 font-medium text-orange-400 items-center">
           <Link href="/" className="hover:text-red-600">Home</Link>
           <Link href="/blood" className="hover:text-red-600">Blood Donation</Link>
-          <Link href="/marketplace" className="hover:text-red-600">Books & Notes</Link>
-          <Link href="/electric" className="hover:text-red-600">Electric Items</Link>
+          <Link href="/marketplace" className="hover:text-red-600">Marketplace</Link>
+          {/* <Link href="/electric" className="hover:text-red-600">Electric Items</Link> */}
           {isAdmin && (
             <Link href="/dashboard/admin" className="hover:text-red-600">Dashboard</Link>
           )}
@@ -67,8 +67,8 @@ export default function Navbar() {
           <nav className="flex flex-col space-y-2 px-4 py-4 font-medium">
             <Link href="/" className="hover:text-red-600" onClick={toggleMenu}>Home</Link>
             <Link href="/blood" className="hover:text-red-600" onClick={toggleMenu}>Blood Donation</Link>
-            <Link href="/marketplace" className="hover:text-red-600" onClick={toggleMenu}>Books & Notes</Link>
-            <Link href="/electric" className="hover:text-red-600" onClick={toggleMenu}>Electric Items</Link>
+            <Link href="/marketplace" className="hover:text-red-600" onClick={toggleMenu}>Marketplace</Link>
+            {/* <Link href="/electric" className="hover:text-red-600" onClick={toggleMenu}>Electric Items</Link> */}
             {isAdmin && (
               <Link href="/dashboard/admin" className="hover:text-red-600" onClick={toggleMenu}>
                 Dashboard

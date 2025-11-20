@@ -16,8 +16,8 @@ export default async function HomePage() {
       {/* Hero Section */}
       <HeroSection />
 
-      <UserInfo></UserInfo>
-      <p>{JSON.stringify(session)}</p>
+      {/* <UserInfo></UserInfo> */}
+      {/* <p>{JSON.stringify(session)}</p> */}
 
       {/* Features Overview */}
       <FeaturesOverview />
