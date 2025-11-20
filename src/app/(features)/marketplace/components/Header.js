@@ -1,8 +1,8 @@
 export default function Header({ cartItemCount, onCartClick }) {
   return (
-    <div className="flex justify-between items-center mb-6">
+    <div className="flex justify-between items-center ">
       <div>
-        <h1 className="text-4xl font-bold text-red-600 mb-2">🛍️ Marketplace</h1>
+        <h1 className="text-3xl font-bold text-red-600 mb-2">🛍️ Marketplace</h1>
         <p className="text-gray-600">Browse products from verified sellers</p>
       </div>
       <button
