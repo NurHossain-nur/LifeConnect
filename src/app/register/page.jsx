@@ -1,11 +1,19 @@
 "use client";
 import React, { useState } from "react";
 import { CheckCircle, AlertCircle, User, Mail, Lock, Eye, EyeOff } from "lucide-react";
-import LoginModal from "../components/LoginModal";
+
 import PhoneInput from "react-phone-input-2";
 import 'react-phone-input-2/lib/style.css';
 
+import dynamic from "next/dynamic";
+
 export default function App() {
+
+  const LoginModal = dynamic(() => import("../components/LoginModal"), {
+    ssr: false,
+  });
+
+
   const [form, setForm] = useState({
     name: "",
     email: "",
