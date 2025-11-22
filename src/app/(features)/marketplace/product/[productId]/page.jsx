@@ -3,15 +3,18 @@
 import { useState, useEffect } from "react";
 import { useCart } from "../../CartContext";
 import Link from "next/link";
+import { useParams } from "next/navigation";
+import ProductGrid from "../../components/ProductGrid";
 
-export default function ProductDetailsPage({ params }) {
+export default function ProductDetailsPage() {
+  const params = useParams();
   const { productId } = params;
   const { addToCart } = useCart();
 
   const [product, setProduct] = useState(null);
   const [mainImage, setMainImage] = useState("");
   const [quantity, setQuantity] = useState(1);
-  const [seller, setSeller] = useState(null); // <-- seller state
+  const [seller, setSeller] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const reviewsPerPage = 5;
@@ -20,7 +23,9 @@ export default function ProductDetailsPage({ params }) {
   const [reviewComment, setReviewComment] = useState("");
   const [reviewRating, setReviewRating] = useState(5);
 
-  // Fetch product
+  const [relatedProducts, setRelatedProducts] = useState([]);
+
+  // Fetch product and seller info
   useEffect(() => {
     async function fetchProduct() {
       const res = await fetch(`/api/marketplace/products/${productId}`);
@@ -28,7 +33,6 @@ export default function ProductDetailsPage({ params }) {
       setProduct(data);
       setMainImage(data.images[0]);
 
-      // Fetch seller info
       const sellerRes = await fetch(`/api/marketplace/sellers/${data.sellerId}`);
       const sellerData = await sellerRes.json();
       setSeller(sellerData);
@@ -36,13 +40,30 @@ export default function ProductDetailsPage({ params }) {
     fetchProduct();
   }, [productId]);
 
+
+  // Fetch related products in the same category
+useEffect(() => {
+  async function fetchRelatedProducts() {
+    if (!product?.category) return;
+
+    const res = await fetch(`/api/marketplace/products?category=${encodeURIComponent(product.category)}&limit=7`);
+    const data = await res.json();
+
+    if (data.success) {
+      const filtered = data.products.filter(p => String(p._id) !== String(product._id));
+      setRelatedProducts(filtered);
+    }
+  }
+
+  fetchRelatedProducts();
+}, [product]);
+
+
   if (!product) {
     return <p className="text-center mt-20 text-red-600">Loading product...</p>;
   }
 
-  const handleAddToCart = () => {
-    addToCart(product, quantity);
-  };
+  const handleAddToCart = () => addToCart(product, quantity);
 
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
@@ -78,19 +99,17 @@ export default function ProductDetailsPage({ params }) {
     currentPage * reviewsPerPage
   );
 
-  const totalPages = Math.ceil(
-    (product.reviews?.length || 0) / reviewsPerPage
-  );
+  const totalPages = Math.ceil((product.reviews?.length || 0) / reviewsPerPage);
 
   return (
-    <div className="max-w-5xl mx-auto py-10 px-4">
+    <div className="max-w-6xl mx-auto py-10 px-4 sm:px-6 lg:px-8 text-black">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
 
         {/* Images */}
         <div>
           <img
             src={mainImage}
-            className="w-full h-96 object-cover rounded-lg shadow"
+            className="w-full h-96 sm:h-[28rem] md:h-[32rem] object-cover rounded-lg shadow"
           />
           <div className="flex gap-3 mt-4 overflow-x-auto">
             {product.images.map((img, idx) => (
@@ -107,38 +126,63 @@ export default function ProductDetailsPage({ params }) {
         </div>
 
         {/* Product Info */}
-        <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-bold">{product.name}</h1>
+        <div className="flex flex-col">
+          <h1 className="text-2xl sm:text-3xl font-bold">{product.name}</h1>
 
-            {/* Average Rating */}
-            {product.reviews?.length > 0 && (
-              <div className="flex items-center gap-1 text-yellow-500">
-                {Array.from({ length: 5 }, (_, i) => (
-                  <span key={i}>
-                    {i < Math.round(averageRating) ? "⭐" : "☆"}
-                  </span>
-                ))}
-                <span className="text-gray-700 ml-1 text-sm">
-                  ({product.reviews.length})
-                </span>
-              </div>
+          {/* Average Rating */}
+          {product.reviews?.length > 0 && (
+            <div className="flex items-center gap-1 text-yellow-500 mt-2">
+              {Array.from({ length: 5 }, (_, i) => (
+                <span key={i}>{i < Math.round(averageRating) ? "⭐" : "☆"}</span>
+              ))}
+              <span className="text-gray-700 ml-2 text-sm">
+                ({product.reviews.length})
+              </span>
+            </div>
+          )}
+
+          {/* Price */}
+          <div className="mt-5 flex items-center gap-3">
+            {product.discount > 0 ? (
+              <>
+                <p className="text-gray-400 text-lg sm:text-xl line-through">
+                  ৳{product.price.toFixed(2)}
+                </p>
+                <p className="text-red-600 text-2xl sm:text-3xl font-semibold">
+                  ৳{(product.price - product.discount).toFixed(2)}
+                </p>
+                <p className="text-green-600 text-sm sm:text-base">
+                  You save: ৳{product.discount.toFixed(2)}
+                </p>
+              </>
+            ) : (
+              <p className="text-red-600 text-2xl sm:text-3xl font-semibold">
+                ৳{product.price.toFixed(2)}
+              </p>
             )}
           </div>
 
-          <p className="text-red-600 text-2xl font-semibold mt-5">
-            ${product.price - (product.discount || 0)}
+          {/* Stock & SKU */}
+          <p className="mt-2 text-gray-700">
+            স্টক: {product.stock} ইউনিট
           </p>
-          {product.discount > 0 && (
-            <p className="text-green-600 mt-1">
-              Discount: ${product.discount}
-            </p>
+          <p className="text-gray-500 text-sm mt-1">SKU: {product.sku || "LOG-MX3-004"}</p>
+
+          {/* Category & Brand */}
+          <p className="text-gray-500 text-sm mt-1">Category: {product.category}</p>
+          <p className="text-gray-500 text-sm mt-1">Brand: {product.brand}</p>
+
+          {/* Description */}
+          {product.description && (
+            <p className="mt-4 text-gray-700 text-sm sm:text-base">{product.description}</p>
           )}
-          <p className="mt-3 text-gray-700">Stock: {product.stock} units</p>
 
           {/* Seller Info */}
           {seller && (
-            <Link href={`/marketplace/shop/${product.sellerId}`} className="mt-4 flex items-center gap-2 cursor-pointer hover:opacity-80 transition">
+            <Link
+              href={`/marketplace/shop/${product.sellerId}`}
+              className="mt-4 flex items-center gap-2 cursor-pointer hover:opacity-80 transition"
+            >
               <img
                 src={seller.profileImage}
                 alt={seller.shopName}
@@ -150,18 +194,25 @@ export default function ProductDetailsPage({ params }) {
           )}
 
           {/* Add to Cart */}
-          <div className="mt-6 flex items-center gap-2">
-            <input
-              type="number"
-              min="1"
-              max={product.stock}
-              value={quantity}
-              onChange={(e) => setQuantity(Number(e.target.value))}
-              className="w-20 px-2 py-1 border rounded focus:ring-2 focus:ring-red-400"
-            />
+          <div className="mt-6 flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            <div className="flex items-center border rounded overflow-hidden">
+              <button
+                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                className="px-2 py-1 bg-gray-200 hover:bg-gray-300 text-base"
+              >
+                -
+              </button>
+              <span className="px-3 py-1 border-x w-14 text-center">{quantity}</span>
+              <button
+                onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
+                className="px-2 py-1 bg-gray-200 hover:bg-gray-300 text-base"
+              >
+                +
+              </button>
+            </div>
             <button
               onClick={handleAddToCart}
-              className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 transition"
+              className="bg-red-500 text-white py-2 px-6 rounded hover:bg-red-600 transition w-full sm:w-auto text-center"
             >
               Add to Cart
             </button>
@@ -171,13 +222,13 @@ export default function ProductDetailsPage({ params }) {
 
       {/* Ratings & Reviews */}
       <div className="mt-10">
-        <h2 className="text-xl font-semibold">⭐ Ratings & Reviews</h2>
+        <h2 className="text-xl font-semibold mb-4">⭐ Ratings & Reviews</h2>
 
         {!product.reviews?.length ? (
-          <p className="mt-4 text-gray-500">No reviews yet.</p>
+          <p className="text-gray-500">No reviews yet.</p>
         ) : (
           <>
-            <div className="mt-5 space-y-5">
+            <div className="space-y-5">
               {paginatedReviews.map((review, idx) => (
                 <div
                   key={idx}
@@ -196,7 +247,7 @@ export default function ProductDetailsPage({ params }) {
             </div>
 
             {totalPages > 1 && (
-              <div className="mt-4 flex gap-2">
+              <div className="mt-4 flex gap-2 flex-wrap">
                 {Array.from({ length: totalPages }, (_, i) => (
                   <button
                     key={i}
@@ -255,6 +306,12 @@ export default function ProductDetailsPage({ params }) {
             Submit Review
           </button>
         </form>
+      </div>
+
+      {/* Related Products */}
+      <div className="mt-10">
+        <h2 className="text-xl font-semibold mb-4">Related Products</h2>
+        <ProductGrid products={relatedProducts} />
       </div>
     </div>
   );

@@ -6,15 +6,15 @@ import { useSession } from "next-auth/react";
 
 import { CartProvider, useCart } from "./CartContext";
 import CartDrawer from "./components/CartDrawer";
-import Header from "./components/Header"; // <-- import header
+import Header from "./components/Header"; 
 
 function MarketplaceNavbar() {
   const pathname = usePathname();
   const { data: session } = useSession();
-  const { cart, setCartOpen } = useCart(); // <-- get cart + drawer control
+  const { cart, setCartOpen } = useCart(); 
 
   const navItems = [
-    { href: "/marketplace", label: "User View" },
+    { href: "/marketplace", label: "All Products" },
     { href: "/marketplace/my-orders", label: "My Orders" },
     session?.user?.role === "seller"
       ? { href: "/marketplace/seller-dashboard", label: "Seller Dashboard" }
@@ -25,15 +25,16 @@ function MarketplaceNavbar() {
     <>
       {/* TOP NAV */}
       <nav className="bg-white shadow-md border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-          <h2 className="text-xl font-semibold text-red-600">Marketplace</h2>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-0">
+          {/* Optional Title */}
+          {/* <h2 className="text-xl font-semibold text-red-600">Marketplace</h2> */}
 
-          <div className="flex gap-4">
+          <div className="flex flex-wrap justify-center sm:justify-start gap-2 sm:gap-4 w-full sm:w-auto">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`px-3 py-2 rounded-md text-sm transition ${
+                className={`px-3 py-2 rounded-md text-sm sm:text-base transition-all duration-200 ${
                   pathname === item.href
                     ? "bg-red-500 text-white"
                     : "text-gray-700 hover:bg-red-100"
@@ -48,7 +49,7 @@ function MarketplaceNavbar() {
 
       {/* MAIN MARKETPLACE HEADER (search + cart button) */}
       <div className="bg-gray-50 border-b">
-        <div className="max-w-7xl mx-auto px-4 py-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <Header
             cartItemCount={Object.values(cart).length}
             onCartClick={() => setCartOpen(true)}
@@ -64,7 +65,9 @@ export default function MarketplaceLayout({ children }) {
     <CartProvider>
       <MarketplaceNavbar />
 
-      <main className="min-w-screen bg-white">{children}</main>
+      <main className="min-h-screen bg-white px-2 sm:px-4 md:px-6 lg:px-8 py-4">
+        {children}
+      </main>
 
       {/* GLOBAL CART DRAWER */}
       <CartDrawer />

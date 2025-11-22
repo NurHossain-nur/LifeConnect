@@ -1,22 +1,27 @@
 import { NextResponse } from "next/server";
 import dbConnect, { collectionNamesObj } from "@/lib/db";
-import { ObjectId } from "mongodb";
 
 export async function GET(req) {
   try {
     const url = new URL(req.url);
     const sellerId = url.searchParams.get("sellerId"); // get ?sellerId=...
-console.log(sellerId);
+    const category = url.searchParams.get("category"); // get ?category=...
+    const limit = Number(url.searchParams.get("limit")) || 5; // default limit 5
+
     const productsCollection = await dbConnect(collectionNamesObj.allSellersProductsCollection);
 
     const query = { isApproved: true, status: "active" };
-    if (sellerId) {
-      query.sellerId = sellerId;
-    }
 
-    const products = await productsCollection.find(query).toArray();
+    if (sellerId) query.sellerId = sellerId;
+    if (category) query.category = category;
 
-    // Convert MongoDB ObjectId to string
+    console.log("Fetching products with category:", category, "Limit:", limit);
+
+    // Apply limit directly in the MongoDB query
+    const products = await productsCollection.find(query).limit(limit).toArray();
+
+    console.log(`Fetched ${products.length} products from database.`);
+
     const formattedProducts = products.map((p) => ({
       ...p,
       _id: p._id.toString(),

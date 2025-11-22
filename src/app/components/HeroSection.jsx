@@ -17,19 +17,19 @@ export default function HeroSection() {
         <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 opacity-0 animate-fadeInUp animation-delay-400">
           <Link
             href="/blood"
-            className="bg-white text-red-600 font-semibold px-4 sm:px-6 py-2 sm:py-3 rounded-lg shadow hover:bg-gray-100 transition-transform transition-colors duration-200 text-sm sm:text-base md:text-lg lg:text-xl transform hover:scale-105 hover:shadow-lg"
+            className="bg-white text-red-600 font-semibold px-4 sm:px-6 py-2 sm:py-3 rounded-lg shadow hover:bg-gray-100 transition-all duration-200 text-sm sm:text-base md:text-lg lg:text-xl transform hover:scale-105 hover:shadow-lg"
           >
             রক্তদান করুন
           </Link>
           <Link
             href="/marketplace"
-            className="bg-white text-pink-600 font-semibold px-4 sm:px-6 py-2 sm:py-3 rounded-lg shadow hover:bg-gray-100 transition-transform transition-colors duration-200 text-sm sm:text-base md:text-lg lg:text-xl transform hover:scale-105 hover:shadow-lg"
+            className="bg-white text-pink-600 font-semibold px-4 sm:px-6 py-2 sm:py-3 rounded-lg shadow hover:bg-gray-100 transition-all duration-200 text-sm sm:text-base md:text-lg lg:text-xl transform hover:scale-105 hover:shadow-lg"
           >
             মার্কেটপ্লেস
           </Link>
           <Link
             href="/ecommerce"
-            className="bg-white text-orange-600 font-semibold px-4 sm:px-6 py-2 sm:py-3 rounded-lg shadow hover:bg-gray-100 transition-transform transition-colors duration-200 text-sm sm:text-base md:text-lg lg:text-xl transform hover:scale-105 hover:shadow-lg"
+            className="bg-white text-orange-600 font-semibold px-4 sm:px-6 py-2 sm:py-3 rounded-lg shadow hover:bg-gray-100 transition-all duration-200 text-sm sm:text-base md:text-lg lg:text-xl transform hover:scale-105 hover:shadow-lg"
           >
             ইলেকট্রিক্যাল স্টোর
           </Link>
