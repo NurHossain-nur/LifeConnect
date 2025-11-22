@@ -6,7 +6,7 @@ export async function GET(req) {
     const url = new URL(req.url);
     const sellerId = url.searchParams.get("sellerId"); // get ?sellerId=...
     const category = url.searchParams.get("category"); // get ?category=...
-    const limit = Number(url.searchParams.get("limit")) || 5; // default limit 5
+    const limit = Number(url.searchParams.get("limit")) || 0; // default 0 = fetch all
 
     const productsCollection = await dbConnect(collectionNamesObj.allSellersProductsCollection);
 
@@ -15,12 +15,14 @@ export async function GET(req) {
     if (sellerId) query.sellerId = sellerId;
     if (category) query.category = category;
 
-    console.log("Fetching products with category:", category, "Limit:", limit);
+    let cursor = productsCollection.find(query);
 
-    // Apply limit directly in the MongoDB query
-    const products = await productsCollection.find(query).limit(limit).toArray();
+    // Apply limit only if limit > 0
+    if (limit > 0) {
+      cursor = cursor.limit(limit);
+    }
 
-    console.log(`Fetched ${products.length} products from database.`);
+    const products = await cursor.toArray();
 
     const formattedProducts = products.map((p) => ({
       ...p,
