@@ -56,6 +56,8 @@ export default function SellerDashboard() {
     }
   };
 
+  console.log("Dashboard Stats:", stats);
+
   if (loading)
     return (
       <div className="flex h-[80vh] items-center justify-center">
@@ -176,7 +178,7 @@ export default function SellerDashboard() {
                             {/* Assuming order.items[0].image exists based on JSON */}
                             <div className="h-10 w-10 relative rounded-md overflow-hidden bg-gray-100 border">
                               <Image 
-                                src={order.items?.[0]?.image || "/placeholder.png"} 
+                                src={order?.items?.[0]?.image || "/placeholder.png"} 
                                 alt="Product"
                                 fill
                                 className="object-cover"
@@ -184,9 +186,9 @@ export default function SellerDashboard() {
                             </div>
                             <div className="flex flex-col">
                                 <span className="font-medium text-gray-800">
-                                    {order.items?.[0]?.name || "Unknown Item"}
+                                    {order?.items?.[0]?.name || "Unknown Item"}
                                 </span>
-                                {order.items?.length > 1 && (
+                                {order?.items?.length > 1 && (
                                     <span className="text-xs text-gray-400">
                                         + {order.items.length - 1} more items
                                     </span>

@@ -89,11 +89,11 @@ export default function AddProductPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 flex justify-center">
+    <div className="min-h-screen bg-gray-50 py-8 px-2 sm:px-6 lg:px-8 flex justify-center">
       <div className="max-w-5xl w-full bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden animate-fadeIn">
         
         {/* Header */}
-        <div className="bg-gradient-to-r from-green-700 to-green-600 px-8 py-6">
+        <div className="bg-gradient-to-r from-green-700 to-green-600 px-4 py-6">
           <h2 className="text-2xl font-bold text-white flex items-center gap-2">
             <Icons.Plus /> নতুন পণ্য যোগ করুন
           </h2>
@@ -102,7 +102,7 @@ export default function AddProductPage() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-8 text-black">
+        <form onSubmit={handleSubmit} className="p-4 text-black">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
             {/* Left Column */}
