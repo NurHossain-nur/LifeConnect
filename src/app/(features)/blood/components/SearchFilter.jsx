@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Search, MapPin, Droplet, RotateCcw, Filter } from "lucide-react";
 
 const bloodGroups = [
   "All",
@@ -40,9 +41,10 @@ export default function SearchFilter({ onFilter }) {
     fetchDistricts();
   }, []);
 
+  // Trigger filter on criteria change
   useEffect(() => {
-  onFilter(criteria);
-}, [criteria]);
+    onFilter(criteria);
+  }, [criteria]);
 
   // Fetch upazilas when district changes
   useEffect(() => {
@@ -52,10 +54,10 @@ export default function SearchFilter({ onFilter }) {
     }
 
     const districtObj = districts.find((d) => d.name === criteria.district);
-  if (!districtObj) {
-    setUpazilas([]);
-    return;
-  }
+    if (!districtObj) {
+      setUpazilas([]);
+      return;
+    }
 
     const fetchUpazilas = async () => {
       try {
@@ -100,43 +102,59 @@ export default function SearchFilter({ onFilter }) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white border border-red-200 rounded-lg shadow p-4 sm:p-6 space-y-4"
+      className="bg-white border border-gray-100 rounded-xl shadow-sm p-5 transition-all duration-300 hover:shadow-md"
     >
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-orange-400">
+      <div className="flex justify-between items-center mb-4 md:hidden">
+        <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+          <Filter className="w-4 h-4 text-red-500" /> Filters
+        </h3>
+        <button
+          type="button"
+          onClick={handleReset}
+          className="text-xs text-red-500 hover:underline flex items-center gap-1"
+        >
+          <RotateCcw className="w-3 h-3" /> Reset
+        </button>
+      </div>
 
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        
         {/* Blood Group */}
-        <div>
-          <label htmlFor="bloodGroup" className="block text-red-700 font-medium mb-1">
-            Blood Group
-          </label>
+        <div className="relative group">
+          <label htmlFor="bloodGroup" className="sr-only">Blood Group</label>
+          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+            <Droplet className="w-4 h-4 text-red-500" />
+          </div>
           <select
             id="bloodGroup"
             name="bloodGroup"
             value={criteria.bloodGroup}
             onChange={handleChange}
-            className="w-full border border-red-300 rounded px-3 py-2 bg-white text-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 shadow-sm"
+            className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition-all cursor-pointer hover:bg-white hover:border-gray-300 appearance-none"
           >
             {bloodGroups.map((bg) => (
               <option key={bg} value={bg}>
-                {bg}
+                {bg === "All" ? "All Blood Groups" : bg}
               </option>
             ))}
           </select>
+          <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+          </div>
         </div>
 
-        
-
         {/* District */}
-        <div>
-          <label htmlFor="district" className="block text-red-700 font-medium mb-1">
-            District
-          </label>
+        <div className="relative group">
+          <label htmlFor="district" className="sr-only">District</label>
+          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+            <MapPin className="w-4 h-4 text-gray-400 group-focus-within:text-red-500 transition-colors" />
+          </div>
           <select
             id="district"
             name="district"
             value={criteria.district}
             onChange={handleChange}
-            className="w-full border border-red-300 rounded px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-red-400 shadow-sm"
+            className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition-all cursor-pointer hover:bg-white hover:border-gray-300 appearance-none"
           >
             <option value="">All Districts</option>
             {districts.map((d) => (
@@ -145,62 +163,69 @@ export default function SearchFilter({ onFilter }) {
               </option>
             ))}
           </select>
+          <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+          </div>
         </div>
 
         {/* Thana / Upazila */}
-        <div>
-          <label htmlFor="thana" className="block text-red-700 font-medium mb-1">
-            Thana / Upazila
-          </label>
+        <div className="relative group">
+          <label htmlFor="thana" className="sr-only">Thana</label>
+          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+            <MapPin className="w-4 h-4 text-gray-400 group-focus-within:text-red-500 transition-colors" />
+          </div>
           <select
             id="thana"
             name="thana"
             value={criteria.thana}
             onChange={handleChange}
             disabled={!criteria.district}
-            className="w-full border border-red-300 rounded px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-red-400 shadow-sm"
+            className={`w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition-all appearance-none
+              ${!criteria.district 
+                ? "cursor-not-allowed opacity-60" 
+                : "cursor-pointer hover:bg-white hover:border-gray-300"
+              }`}
           >
-            <option value="">All Upazilas</option>
+            <option value="">All Areas (Thana)</option>
             {upazilas.map((upa) => (
               <option key={upa.id} value={upa.name}>
                 {upa.name}
               </option>
             ))}
           </select>
+          <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+          </div>
         </div>
-      </div>
 
-      {/* Global Search */}
-        <div>
-          <label htmlFor="search" className="block text-red-700 font-medium mb-1">
-            Search
-          </label>
+        {/* Global Search */}
+        <div className="relative group">
+          <label htmlFor="search" className="sr-only">Search</label>
+          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+            <Search className="w-4 h-4 text-gray-400 group-focus-within:text-red-500 transition-colors" />
+          </div>
           <input
             type="text"
             id="search"
             name="search"
             value={criteria.search}
             onChange={handleChange}
-            placeholder="Name, phone, notes..."
-            className="w-full border border-red-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-400 shadow-sm text-orange-400"
+            placeholder="Search by name, phone..."
+            className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition-all placeholder-gray-400 hover:bg-white hover:border-gray-300"
           />
         </div>
+      </div>
 
-      {/* Buttons */}
-      <div className="flex justify-end space-x-3 pt-2">
+      {/* Desktop Reset Button */}
+      <div className="hidden md:flex justify-end mt-4 pt-3 border-t border-gray-50">
         <button
           type="button"
           onClick={handleReset}
-          className="px-4 py-2 bg-gray-100 border border-gray-300 text-gray-700 rounded hover:bg-gray-200 transition"
+          className="text-sm text-gray-500 hover:text-red-600 flex items-center gap-1.5 transition-colors px-3 py-1.5 rounded-md hover:bg-red-50"
         >
-          Reset
+          <RotateCcw className="w-3.5 h-3.5" />
+          Clear Filters
         </button>
-        {/* <button
-          type="submit"
-          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
-        >
-          Filter
-        </button> */}
       </div>
     </form>
   );
