@@ -36,6 +36,12 @@ export default function SellerDashboard({ children }) {
     { label: "আমার পণ্যসমূহ", icon: "🛍️", href: "/marketplace/seller-dashboard/my-products" },
     { label: "অর্ডারসমূহ", icon: "📦", href: "/marketplace/seller-dashboard/orders" },
     { label: "পণ্য যোগ করুন", icon: "➕", href: "/marketplace/seller-dashboard/add-product" },
+    
+    // ⭐ NEW ITEMS
+    { label: "রেফারেল কমিশন", icon: "🎁", href: "/marketplace/seller-dashboard/referral" },
+    { label: "উইথড্রয়াল", icon: "💰", href: "/marketplace/seller-dashboard/withdrawal" },
+
+
     { label: "সেটিংস", icon: "⚙️", href: "/marketplace/seller-dashboard/settings" },
   ];
 

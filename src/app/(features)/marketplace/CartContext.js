@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
+import Swal from "sweetalert2";
 
 const CartContext = createContext();
 export const useCart = () => useContext(CartContext);
@@ -35,9 +36,32 @@ export function CartProvider({ children }) {
       const existing = prev[product._id];
       const newQty = existing ? existing.quantity + quantity : quantity;
 
+      // Professional Stock Alert (Toast)
       if (newQty > product.stock) {
-        alert(`Only ${product.stock} units available`);
+        Swal.fire({
+          icon: 'warning',
+          title: 'স্টক শেষ!',
+          text: `মাত্র ${product.stock} টি পণ্য স্টকে আছে`,
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+        });
         return prev;
+      }
+
+      // Success Toast (Optional, for better UX)
+      if (!existing) {
+         Swal.fire({
+            icon: 'success',
+            title: 'কার্টে যোগ করা হয়েছে',
+            text: product.name,
+            toast: true,
+            position: 'bottom-end',
+            showConfirmButton: false,
+            timer: 2000
+         });
       }
 
       return { ...prev, [product._id]: { product, quantity: newQty } };
@@ -69,15 +93,28 @@ export function CartProvider({ children }) {
   const handleCheckout = async () => {
     const cartItems = Object.values(cart);
 
+    // Empty Cart Alert
     if (cartItems.length === 0) {
-      alert("Your cart is empty!");
-      return;
+      Swal.fire({
+        icon: 'info',
+        title: 'আপনার ঝুড়ি খালি',
+        text: 'অনুগ্রহ করে প্রথমে কিছু পণ্য যোগ করুন।',
+        confirmButtonColor: '#3085d6',
+      });
+      return false;
     }
 
     const { name, email, phone, address } = checkoutForm;
-    if (!name || !email || !phone || !address) {
-      alert("Please fill in all your details.");
-      return;
+    
+    // Validation Alert
+    if (!name || !phone || !address) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'তথ্য আবশ্যক',
+        text: 'অনুগ্রহ করে আপনার নাম, ফোন নম্বর এবং ঠিকানা প্রদান করুন।',
+        confirmButtonColor: '#d33',
+      });
+      return false;
     }
 
     try {
@@ -108,11 +145,15 @@ export function CartProvider({ children }) {
       const data = await res.json();
 
       if (!res.ok) {
-        alert(data.message || "Checkout failed.");
-        return;
+        Swal.fire({
+            icon: 'error',
+            title: 'দুঃখিত',
+            text: data.message || "অর্ডার সম্পন্ন করা যায়নি।",
+        });
+        return false;
       }
 
-      // Save order
+      // Save order locally
       const savedOrders = JSON.parse(localStorage.getItem("myOrders") || "[]");
       savedOrders.push({
         orderId: data.orderId,
@@ -124,14 +165,21 @@ export function CartProvider({ children }) {
 
       localStorage.setItem("myOrders", JSON.stringify(savedOrders));
 
-      alert("Order placed successfully!");
-
+      // Clear Cart
       setCart({});
-      setCartOpen(false);
       setCheckoutForm({ name: "", email: "", phone: "", address: "" });
+      
+      // Return true to let the UI Component (Drawer) handle closing and success animation
+      return true;
+
     } catch (err) {
       console.error(err);
-      alert("Error placing order.");
+      Swal.fire({
+        icon: 'error',
+        title: 'সার্ভার ত্রুটি',
+        text: 'দয়া করে কিছুক্ষণ পর আবার চেষ্টা করুন।',
+      });
+      return false;
     } finally {
       setCheckoutLoading(false);
     }

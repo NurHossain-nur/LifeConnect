@@ -14,6 +14,19 @@ export default function MyOrdersPage() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Modern Alert States
+  const [alert, setAlert] = useState({ open: false, type: "", message: "", onConfirm: null });
+
+
+  const showAlert = (type, message, onConfirm = null) => {
+    setAlert({ open: true, type, message, onConfirm });
+  };
+
+  const closeAlert = () => {
+    setAlert({ open: false, type: "", message: "", onConfirm: null });
+  };
+
+
   // Load orders from localStorage (Logic Unchanged)
   useEffect(() => {
     const savedOrders = JSON.parse(localStorage.getItem("myOrders") || "[]");
@@ -49,29 +62,30 @@ export default function MyOrdersPage() {
 
   // Cancel Order (Logic Unchanged)
   const handleDeleteOrder = async (orderId) => {
-    if (!confirm("আপনি কি নিশ্চিত অর্ডারটি বাতিল করতে চান?")) return;
+    showAlert("confirm", "আপনি কি নিশ্চিত আপনি এই অর্ডারটি বাতিল করতে চান?", async () => {
+      closeAlert(); 
 
-    try {
-      const res = await fetch(`/api/marketplace/orders/${orderId}`, {
-        method: "DELETE",
-      });
+      try {
+        const res = await fetch(`/api/marketplace/orders/${orderId}`, {
+          method: "DELETE",
+        });
 
-      const data = await res.json();
+        const data = await res.json();
 
-      if (!res.ok) {
-        alert(data.message || "অর্ডার বাতিল করা সম্ভব হয়নি!");
-        return;
+        if (!res.ok) {
+          showAlert("error", data.message || "অর্ডার বাতিল করা সম্ভব হয়নি!");
+          return;
+        }
+
+        const updatedOrders = orders.filter((o) => o.orderId !== orderId);
+        setOrders(updatedOrders);
+        localStorage.setItem("myOrders", JSON.stringify(updatedOrders));
+
+        showAlert("success", "অর্ডার সফলভাবে বাতিল হয়েছে!");
+      } catch (error) {
+        showAlert("error", "একটি সমস্যা হয়েছে! পরে আবার চেষ্টা করুন।");
       }
-
-      const updatedOrders = orders.filter((o) => o.orderId !== orderId);
-      setOrders(updatedOrders);
-      localStorage.setItem("myOrders", JSON.stringify(updatedOrders));
-
-      alert("অর্ডার সফলভাবে বাতিল হয়েছে!");
-    } catch (error) {
-      console.error("Error canceling order:", error);
-      alert("একটি সমস্যা হয়েছে! পরে আবার চেষ্টা করুন।");
-    }
+    });
   };
 
   // --- Loading Skeleton UI ---
@@ -241,6 +255,9 @@ export default function MyOrdersPage() {
         ))}
       </div>
 
+      {/* Modern Alert Component */}
+      <ModernAlert alert={alert} closeAlert={closeAlert} />
+
       <style jsx global>{`
         @keyframes slideUp {
           from { opacity: 0; transform: translateY(10px); }
@@ -252,6 +269,85 @@ export default function MyOrdersPage() {
         .animate-fadeIn {
            animation: slideUp 0.5s ease-out;
         }
+      `}</style>
+    </div>
+  );
+}
+
+
+
+
+/* -------------------------- Modern Alert Component -------------------------- */
+function ModernAlert({ alert, closeAlert }) {
+  if (!alert.open) return null;
+
+  return (
+    <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fadeIn">
+      <div className="bg-white w-full max-w-sm rounded-2xl p-6 shadow-lg animate-scaleIn">
+
+        {/* ICON */}
+        <div className="text-center mb-3">
+          {alert.type === "success" && (
+            <svg className="w-14 h-14 text-green-600 mx-auto" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          )}
+          {alert.type === "error" && (
+            <svg className="w-14 h-14 text-red-600 mx-auto" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          )}
+          {alert.type === "confirm" && (
+            <svg className="w-14 h-14 text-yellow-500 mx-auto" fill="none" strokeWidth="1.5" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01M5 21l1.5-4M12 3l7 18H5l7-18z" />
+            </svg>
+          )}
+        </div>
+
+        {/* MESSAGE */}
+        <p className="text-center text-gray-700 font-medium">{alert.message}</p>
+
+        {/* BUTTONS */}
+        <div className="mt-6 flex justify-center gap-3">
+          {alert.type === "confirm" ? (
+            <>
+              <button
+                onClick={closeAlert}
+                className="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 font-medium hover:bg-gray-300"
+              >
+                না
+              </button>
+
+              <button
+                onClick={alert.onConfirm}
+                className="px-4 py-2 rounded-lg bg-red-600 text-white font-bold hover:bg-red-700"
+              >
+                হ্যাঁ
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={closeAlert}
+              className="px-5 py-2 w-full rounded-lg bg-green-600 text-white font-bold hover:bg-green-700"
+            >
+              ঠিক আছে
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Animations */}
+      <style jsx global>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes scaleIn {
+          from { transform: scale(0.85); opacity: 0; }
+          to { transform: scale(1); opacity: 1; }
+        }
+        .animate-fadeIn { animation: fadeIn 0.3s ease-out; }
+        .animate-scaleIn { animation: scaleIn 0.25s ease-out; }
       `}</style>
     </div>
   );
