@@ -41,7 +41,7 @@ export default function CartDrawer() {
       <div
         className={`text-black fixed z-50 flex flex-col bg-white shadow-xl transform transition-transform
           sm:top-0 sm:right-0 sm:h-full sm:w-96 sm:translate-x-${cartOpen ? "0" : "full"}
-          bottom-0 left-0 w-full h-[75%] rounded-t-lg sm:rounded-none
+          bottom-0 left-0 w-full h-[85%] rounded-t-lg sm:rounded-none
           ${cartOpen ? "translate-y-0" : "translate-y-full"}
         `}
       >
@@ -66,7 +66,7 @@ export default function CartDrawer() {
             cartItems.map(({ product, quantity }) => (
               <div
                 key={product._id}
-                className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-2 gap-2 sm:gap-0"
+                className="flex  sm:flex-row justify-between items-start sm:items-center border-b pb-2 gap-2 sm:gap-0"
               >
                 <div className="flex items-start sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
                   <img
@@ -89,7 +89,7 @@ export default function CartDrawer() {
                 </div>
 
                 {/* Quantity Controls */}
-                <div className="flex items-center sm:flex-col gap-1 mt-1 sm:mt-0 w-full sm:w-auto">
+                <div className="flex items-center flex-col gap-1 mt-1 sm:mt-0 w-full sm:w-auto">
                   <div className="flex border rounded overflow-hidden text-xs sm:text-sm">
                     <button
                       onClick={() =>
@@ -132,7 +132,7 @@ export default function CartDrawer() {
 
         {/* Checkout Section */}
 {cartItems.length > 0 && (
-  <div className="p-3 sm:p-4 border-t border-gray-200 space-y-2 sm:space-y-3 text-xs sm:text-sm bg-white sticky bottom-0">
+  <div className="p-3 sm:p-4 border-t border-gray-200 space-y-1 sm:space-y-2 text-xs sm:text-sm bg-white sticky bottom-0">
     
     {/* Section Title */}
     <h3 className="font-semibold text-sm sm:text-base mb-1">ক্রেতার তথ্য</h3>
