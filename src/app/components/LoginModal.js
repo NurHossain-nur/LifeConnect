@@ -7,7 +7,7 @@ import 'react-phone-input-2/lib/style.css';
 import { Mail, Lock, X, Eye, EyeOff } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
 
-export default function LoginModal({ isOpen, onClose, initialEmail = "" }) {
+export default function LoginModal({ isOpen, onClose, initialEmail = "", redirect  }) {
   const [loginMethod, setLoginMethod] = useState("email"); // 'email' or 'phone'
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -18,7 +18,9 @@ export default function LoginModal({ isOpen, onClose, initialEmail = "" }) {
 
   const searchParams = useSearchParams();
   const router = useRouter();
-  const redirectTo = searchParams.get("redirect") || "/";
+  // const redirectTo = searchParams.get("redirect") || "/";
+
+  const redirectTo = redirect || searchParams.get("redirect") || "/";
 
   // Pre-fill email if passed from Register page
   useEffect(() => {

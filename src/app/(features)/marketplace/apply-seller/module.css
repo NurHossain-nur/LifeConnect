@@ -1,0 +1,11 @@
+/* Progress Bar Animation */
+@keyframes progressBar {
+  0%   { transform: scaleX(0); }
+  50%  { transform: scaleX(1); }
+  100% { transform: scaleX(0); }
+}
+
+.animate-progressBar {
+  transform-origin: left;
+  animation: progressBar 2s ease-in-out infinite;
+}

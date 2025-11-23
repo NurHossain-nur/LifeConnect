@@ -18,9 +18,14 @@
 "use client";
 import { useState } from "react";
 import LoginModal from "./LoginModal";
+import { usePathname } from "next/navigation";
 
-export default function LoginButton() {
+export default function LoginButton({ redirect }) {
   const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
+
+  // If no redirect prop passed → fallback to current page
+  const finalRedirect = redirect || pathname;
 
   return (
     <>
@@ -28,9 +33,9 @@ export default function LoginButton() {
         onClick={() => setIsOpen(true)}
         className="text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded"
       >
-        Login
+        🔑 লগইন করুন
       </button>
-      <LoginModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
+      <LoginModal isOpen={isOpen} onClose={() => setIsOpen(false)} redirect={finalRedirect} />
     </>
   );
 }

@@ -1,6 +1,9 @@
 "use client";
+import LoginButton from "@/app/components/LoginButton";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+
+import styles from '../apply-seller/module.css';
 
 export default function ApplySellerPage() {
   const { data: session, status } = useSession();
@@ -23,6 +26,9 @@ export default function ApplySellerPage() {
   const [submittedReferralCode, setSubmittedReferralCode] = useState(""); // New: to display after submit
   const [error, setError] = useState(""); // New: for invalid referral code
 
+  const [sellerApplication, setSellerApplication] = useState(null);
+  const [loadingApp, setLoadingApp] = useState(true);
+
   useEffect(() => {
     if (session?.user) {
       setFormData((prev) => ({
@@ -32,6 +38,24 @@ export default function ApplySellerPage() {
       }));
     }
   }, [session]);
+
+  // Fetch seller application when logged in:
+  useEffect(() => {
+  if (session?.user?._id) {
+    fetch(`/api/marketplace/seller/check?userId=${session.user._id}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data?.application) {
+          setSellerApplication(data.application);
+        }
+      })
+      .finally(() => setLoadingApp(false));
+  } else {
+    setLoadingApp(false);
+  }
+}, [session]);
+
+// console.log("Seller Application:", sellerApplication);
 
   const handleChange = (e) => {
     const { name, value, files, type, checked } = e.target;
@@ -79,9 +103,134 @@ export default function ApplySellerPage() {
     }
   };
 
+
+  // ❗ NEW FEATURE: If user is NOT logged in, show a message, not the form
+  if (!session && status !== "loading") {
+  return (
+    <div className="max-w-lg mx-auto mt-10 bg-white p-6 sm:p-8 rounded-2xl shadow-lg text-center text-black 
+      animate-fadeIn" 
+    >
+      {/* Animated Icon */}
+      <div className="flex justify-center mb-4">
+        <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center 
+          text-3xl animate-bounce-slow shadow-md"
+        >
+          🔒
+        </div>
+      </div>
+
+      <h2 className="text-2xl sm:text-3xl font-extrabold text-red-600 mb-4">
+        সেলার হতে আপনাকে লগইন করতে হবে
+      </h2>
+
+      <p className="text-gray-700 text-base sm:text-lg leading-relaxed px-2">
+        আমাদের প্ল্যাটফর্মে সেলার হিসেবে যোগ দিতে হলে আগে{" "}
+        <span className="font-semibold text-red-600">লগইন</span> অথবা{" "}
+        <span className="font-semibold text-green-600">রেজিস্ট্রেশন</span>{" "}
+        করতে হবে। 
+        <br />
+        লগইন করার পর আপনি সহজেই সেলার অ্যাপ্লিকেশন ফর্ম দেখতে এবং পূরণ করতে পারবেন।
+      </p>
+
+      {/* Info Box */}
+      <div className="mt-5 bg-gradient-to-r from-red-50 to-red-100 border border-red-200 p-4 rounded-xl shadow-sm">
+        <p className="text-sm text-gray-700">
+          👉 সেলার অ্যাকাউন্ট তৈরি করলে আপনি আপনার নিজস্ব দোকান খুলে প্রোডাক্ট বিক্রি করতে পারবেন।
+        </p>
+        <p className="text-sm text-gray-700 mt-1">
+          👉 অনুমোদন পেতে মাত্র ২৪ ঘণ্টা লাগবে।
+        </p>
+      </div>
+
+      {/* Buttons */}
+      <div className="flex flex-col sm:flex-row justify-center gap-4 mt-6">
+        <LoginButton redirect="/marketplace/apply-seller"></LoginButton>
+        <a
+          href="/register"
+          className="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-green-600 transition-all 
+            transform hover:-translate-y-1 hover:shadow-xl w-full sm:w-auto block animate-slideUp delay-200"
+        >
+          📝 রেজিস্টার করুন
+        </a>
+      </div>
+    </div>
+  );
+}
+
   if (status === "loading") {
-    return <p className="text-center mt-10 text-gray-500">Loading...</p>;
+    return <p className="text-center mt-10 text-gray-500">লোডিং হচ্ছে...</p>;
   }
+
+  // If user has already applied and still pending
+  // If user has already applied and still pending
+if (sellerApplication && sellerApplication.status === "pending") {
+  return (
+    <div className="max-w-xl mx-auto mt-12 p-6 sm:p-8 bg-white rounded-2xl shadow-xl text-black
+                    animate-fadeIn sm:animate-slideUp">
+      
+      {/* Header */}
+      <div className="flex flex-col items-center text-center">
+        <div className="w-20 h-20 flex items-center justify-center bg-orange-100 rounded-full mb-4 shadow-md
+                        animate-bounce-slow text-4xl">
+          🕒
+        </div>
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-orange-600 mb-3">
+          আপনার সেলার আবেদন পর্যালোচনাধীন
+        </h2>
+        <p className="text-gray-700 sm:text-lg leading-relaxed px-2 sm:px-0">
+          আপনার সেলার হওয়ার আবেদনটি সফলভাবে জমা দেওয়া হয়েছে। <br />
+          আমাদের টিম আপনার তথ্য যাচাই করছে। সাধারণত <b>২৪ ঘণ্টা</b> এর মধ্যে অনুমোদন সম্পন্ন হয়।
+        </p>
+      </div>
+
+      {/* Application Summary Card */}
+      <div className="mt-6 bg-gradient-to-r from-orange-50 to-orange-100 border border-orange-200 
+                      p-5 rounded-2xl shadow-md transform transition-all hover:scale-105">
+        <h3 className="text-xl font-semibold text-orange-700 mb-3 text-center">আপনার আবেদনের সারসংক্ষেপ</h3>
+        
+        <div className="space-y-2 text-gray-800">
+          <p><span className="font-semibold">নাম:</span> {sellerApplication.name}</p>
+          <p><span className="font-semibold">দোকানের নাম:</span> {sellerApplication.shopName}</p>
+          <p><span className="font-semibold">ফোন:</span> {sellerApplication.phoneNumber}</p>
+          <p><span className="font-semibold">স্ট্যাটাস:</span> 
+            <span className="text-orange-600 font-bold ml-1">Pending (Review চলছে)</span>
+          </p>
+          <p className="text-sm text-gray-500 mt-2">
+            আবেদন জমা দেওয়ার সময়: {new Date(sellerApplication.createdAt).toLocaleString("bn-BD")}
+          </p>
+        </div>
+
+        {/* Animated Progress Bar */}
+        <div className="mt-5 bg-orange-200 rounded-full h-3 overflow-hidden shadow-inner">
+          <div className="h-3 bg-orange-500 rounded-full animate-progressBar"></div>
+        </div>
+        <p className="text-sm text-gray-600 mt-1 text-center">অ্যাপ্লিকেশন প্রক্রিয়াধীন...</p>
+      </div>
+
+      {/* Info / Guidance */}
+      <div className="mt-6 bg-orange-50 border border-orange-200 rounded-xl p-4 text-center shadow-sm
+                      animate-fadeIn delay-200">
+        <p className="text-gray-600 sm:text-sm">
+          যদি ভুল তথ্য দিয়ে থাকেন বা কোনো সাহায্য প্রয়োজন, লাইভ চ্যাট বা সাপোর্টে যোগাযোগ করুন।<br/>
+          আমাদের টিম দ্রুত সাড়া দেবে। 
+        </p>
+      </div>
+
+      {/* Footer CTA */}
+      <div className="mt-6 text-center">
+        <a href="/marketplace" 
+           className="inline-block bg-orange-500 text-white px-6 py-3 rounded-full shadow-lg 
+                      hover:bg-orange-600 transition transform hover:-translate-y-1 hover:shadow-xl
+                      text-sm sm:text-base font-medium animate-slideUp delay-300">
+          বাজারে ফিরে যান
+        </a>
+      </div>
+
+      
+    </div>
+  );
+}
+
 
   return (
     <div className="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow text-black">
